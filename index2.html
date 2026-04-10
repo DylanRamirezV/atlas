@@ -4,16 +4,33 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ATLAS</title>
-  <style>
+ 
+</head>
+<body>
+    <header>
+      <nav aria-label="Barra superior">
+        <div>
+          <strong>Mi Plataforma</strong>
+        </div>
+        <div>
+          <label for="busqueda">Buscar:</label>
+          <input id="busqueda" name="busqueda" type="text" placeholder="Buscar archivos..." />
+          <button type="button">Buscar</button>
+        </div>
+        <div>
+          <input id="archivo" name="archivo" type="file" />
+          <button type="button" id="boton-subir">Subir archivo</button>
+          <div id="nombre-archivo" aria-live="polite"></div>
+        </div>
+      </nav>
+    </header>
+     <style>
     /* CSS minimo solo para mostrar/ocultar secciones */
     .screen { display: none; }
     #institucional { display: block; }
     .screen:target { display: block; }
     .screen:target ~ #institucional { display: none; }
  </style>
-</head>
-<body>
-  
   <aside>
     <nav>
       <ul>
