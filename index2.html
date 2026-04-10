@@ -1,0 +1,44 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ATLAS</title>
+  <style>
+    /* CSS minimo solo para mostrar/ocultar secciones */
+    .screen { display: none; }
+    #institucional { display: block; }
+    .screen:target { display: block; }
+    .screen:target ~ #institucional { display: none; }
+ </style>
+</head>
+<body>
+  
+  <aside>
+    <nav>
+      <ul>
+        <li><a href="#institucional">Institucional</a></li>
+        <li><a href="#archivos">Mis archivos</a></li>
+        <li><a href="#proyecto">Sobre nuestro proyecto</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main>
+    <section id="archivos" class="screen" data-section="archivos">
+      <h1>Mis archivos</h1>
+      <p>Listado de documentos, tareas y recursos del curso.</p>
+    </section>
+
+    <section id="proyecto" class="screen" data-section="proyecto">
+      <h1>Sobre nuestro proyecto</h1>
+      <p>Descripcion general, objetivos y avance de la iniciativa educativa.</p>
+    </section>
+
+    <section id="institucional" class="screen" data-section="institucional">
+      <h1>Institucional</h1>
+      <p>Informacion oficial, anuncios y politicas de la plataforma.</p>
+    </section>
+  </main>
+</body>
+</html>
