@@ -4,33 +4,32 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ATLAS</title>
+  <link rel="stylesheet" href="styles.css" />
  
 </head>
-<body>
+  <body>
+    <input type="checkbox" id="sidebar-toggle" checked />
     <header>
       <nav aria-label="Barra superior">
-        <div>
+        <div class="brand">
+          <label for="sidebar-toggle" class="icon-button" aria-label="Mostrar menu">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+          </label>
           <strong>Mi Plataforma</strong>
         </div>
-        <div>
+        <div class="search">
           <label for="busqueda">Buscar:</label>
           <input id="busqueda" name="busqueda" type="text" placeholder="Buscar archivos..." />
           <button type="button">Buscar</button>
         </div>
-        <div>
+        <div class="actions">
           <input id="archivo" name="archivo" type="file" />
-          <button type="button" id="boton-subir">Subir archivo</button>
-          <div id="nombre-archivo" aria-live="polite"></div>
+          <label for="archivo" class="btn">Subir archivo</label>
         </div>
       </nav>
     </header>
-     <style>
-    /* CSS minimo solo para mostrar/ocultar secciones */
-    .screen { display: none; }
-    #institucional { display: block; }
-    .screen:target { display: block; }
-    .screen:target ~ #institucional { display: none; }
- </style>
   <aside>
     <nav>
       <ul>
@@ -45,6 +44,32 @@
     <section id="archivos" class="screen" data-section="archivos">
       <h1>Mis archivos</h1>
       <p>Listado de documentos, tareas y recursos del curso.</p>
+      <div class="cards-grid">
+        <article class="card">
+          <h3>Guia de estudio</h3>
+          <small>PDF · Semana 4</small>
+        </article>
+        <article class="card">
+          <h3>Actividad 2</h3>
+          <small>Entrega · Viernes</small>
+        </article>
+        <article class="card">
+          <h3>Lectura 1</h3>
+          <small>Articulo · 12 paginas</small>
+        </article>
+        <article class="card">
+          <h3>Video clase</h3>
+          <small>MP4 · 18 min</small>
+        </article>
+        <article class="card">
+          <h3>Rubrica</h3>
+          <small>PDF · Evaluacion</small>
+        </article>
+        <article class="card">
+          <h3>Proyecto final</h3>
+          <small>Carpeta · Activo</small>
+        </article>
+      </div>
     </section>
 
     <section id="proyecto" class="screen" data-section="proyecto">
@@ -55,6 +80,20 @@
     <section id="institucional" class="screen" data-section="institucional">
       <h1>Institucional</h1>
       <p>Informacion oficial, anuncios y politicas de la plataforma.</p>
+      <div class="cards-grid">
+        <article class="card">
+          <h3>Calendario academico</h3>
+          <small>Actualizado hoy</small>
+        </article>
+        <article class="card">
+          <h3>Comunicado oficial</h3>
+          <small>Normas y anuncios</small>
+        </article>
+        <article class="card">
+          <h3>Bienestar estudiantil</h3>
+          <small>Servicios disponibles</small>
+        </article>
+      </div>
     </section>
   </main>
 </body>
