@@ -8,15 +8,14 @@
  
 </head>
   <body>
-    <input type="checkbox" id="sidebar-toggle" checked />
     <header>
       <nav aria-label="Barra superior">
         <div class="brand">
-          <label for="sidebar-toggle" class="icon-button" aria-label="Mostrar menu">
+          <button type="button" class="icon-button" id="sidebar-toggle" aria-label="Mostrar menu">
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
-          </label>
+          </button>
           <strong>Mi Plataforma</strong>
         </div>
         <div class="search">
@@ -30,7 +29,8 @@
         </div>
       </nav>
     </header>
-  <aside>
+    <div class="backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
+    <aside id="sidebar" aria-hidden="true">
     <nav>
       <ul>
         <li><a href="#institucional">Institucional</a></li>
@@ -96,5 +96,6 @@
       </div>
     </section>
   </main>
+  <script src="sidebar.js"></script>
 </body>
 </html>
