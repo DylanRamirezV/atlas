@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Iniciar sesion | ATLAS{% endblock %}
+{% block body_class %}login-page{% endblock %}
+
+{% block body %}
+<main class="login-shell">
+  <section class="login-hero" aria-label="Bienvenida">
+    <p class="eyebrow">Portal academico</p>
+    <h1>ATLAS</h1>
+    <p>Organiza tus recursos, entregas y comunicados en una experiencia clara, elegante y lista para estudiar.</p>
+  </section>
+
+  <section class="login-card" aria-label="Inicio de sesion">
+    <p class="eyebrow">Bienvenido de nuevo</p>
+    <h2>Inicia sesion</h2>
+
+    {% if error %}
+    <p class="alert">{{ error }}</p>
+    {% endif %}
+
+    <form action="/login" method="post">
+      <label for="email">Correo institucional</label>
+      <input id="email" name="email" type="email" autocomplete="email" placeholder="atlas@gmail.com" required />
+
+      <label for="password">Contrasena</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" placeholder="atlas123" required />
+
+      <button type="submit">Entrar a ATLAS</button>
+    </form>
+
+    <details class="login-help">
+      <summary>No sabes como iniciar sesion, click aqui</summary>
+      <ol>
+        <li>Escribe el correo institucional asignado por la plataforma.</li>
+        <li>Ingresa tu contrasena academica.</li>
+        <li>Para esta simulacion usa: estudiante@atlas.edu y atlas123.</li>
+        <li>Presiona Entrar a ATLAS para abrir tu panel.</li>
+      </ol>
+    </details>
+  </section>
+</main>
+{% endblock %}

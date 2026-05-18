@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Panel principal | ATLAS{% endblock %}
+
+{% block body %}
+{% include "partials/topbar.html" %}
+{% include "partials/sidebar.html" %}
+
+<main>
+  <section>
+    <h1>Hola, {{ student.nombre }}</h1>
+  </section>
+
+  <section id="archivos" class="screen" data-section="archivos">
+    <h1>Mis archivos</h1>
+    <p>Listado de documentos, tareas y recursos del curso.</p>
+    <div class="cards-grid">
+      {% for file in files %}
+      <article class="card">
+        <h3>{{ file.nombre }}</h3>
+        <small>{{ file.tipo }} - {{ file.detalle }}</small>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section id="subir" class="screen" data-section="subir">
+    <h1>Subir archivos</h1>
+    <p>Agrega recursos a tu lista de documentos academicos desde el menu lateral.</p>
+    {% if upload_message %}
+    <p class="success">{{ upload_message }}</p>
+    {% endif %}
+    <form class="upload-panel" action="/upload" method="post" enctype="multipart/form-data">
+      <label for="archivo">Selecciona un archivo</label>
+      <input id="archivo" name="archivo" type="file" required />
+      <button type="submit">Subir archivo</button>
+    </form>
+  </section>
+
+  <section id="proyecto" class="screen" data-section="proyecto">
+    <h1>Sobre nuestro proyecto</h1>
+    <p>Descripcion general, objetivos y avance de la iniciativa educativa.</p>
+    <div class="cards-grid">
+      <article class="card">
+        <h3>Objetivo</h3>
+        <small>Centralizar recursos academicos en un panel sencillo.</small>
+      </article>
+      <article class="card">
+        <h3>Avance</h3>
+        <small>Interfaz funcional con estudiante simulado.</small>
+      </article>
+    </div>
+  </section>
+
+  <section id="institucional" class="screen" data-section="institucional">
+    <h1>Institucional</h1>
+    <p>Informacion oficial, anuncios y politicas de la plataforma.</p>
+    <div class="cards-grid">
+      <article class="card">
+        <h3>Calendario academico</h3>
+        <small>Actualizado hoy</small>
+      </article>
+      <article class="card">
+        <h3>Comunicado oficial</h3>
+        <small>Normas y anuncios</small>
+      </article>
+      <article class="card">
+        <h3>Bienestar estudiantil</h3>
+        <small>Servicios disponibles</small>
+      </article>
+    </div>
+  </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='sidebar.js') }}"></script>
+{% endblock %}
