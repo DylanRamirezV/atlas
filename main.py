@@ -1,10 +1,13 @@
 from pathlib import Path
-
-from fastapi import FastAPI, File, Form, Request, UploadFile
+from fastapi import FastAPI, File, Form, Request, UploadFile, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+# Importamos lo necesario para conectar con Neon
+from sqlalchemy.orm import Session
+from database import get_db
+import models
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -12,13 +15,6 @@ app = FastAPI(title="ATLAS")
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
-
-STUDENT_DATABASE = {
-    "correo": "atlas@gmail.com",
-    "password": "atlas123",
-    "nombre": "sultano de tal",
-    "grupo": "Grupo 11-3 - Programación",
-}
 
 UPLOADED_FILES = [
     {"nombre": "Guia de estudio", "tipo": "PDF", "detalle": "Semana 4"},
@@ -29,47 +25,75 @@ UPLOADED_FILES = [
     {"nombre": "Proyecto final", "tipo": "Carpeta", "detalle": "Activo"},
 ]
 
+GROUP_FILES = [
+    {"nombre": "Plan de trabajo grupal", "tipo": "PDF", "detalle": "Compartido"},
+    {"nombre": "Acta de reunion", "tipo": "DOCX", "detalle": "Ultima sesion"},
+    {"nombre": "Material de apoyo", "tipo": "Carpeta", "detalle": "Grupo actual"},
+]
+
 
 @app.get("/", response_class=HTMLResponse)
 async def login_page(request: Request):
-    return templates.TemplateResponse(request, "pages/login.html",)
+    return templates.TemplateResponse(request, "pages/login.html")
 
 
 @app.post("/login", response_class=HTMLResponse)
-async def login(request: Request, email: str = Form(...), password: str = Form(...)):
-    valid_login = (
-        email.strip().lower() == STUDENT_DATABASE["correo"]
-        and password == STUDENT_DATABASE["password"]
+async def login(
+    request: Request, 
+    identificacion: str = Form(...), 
+    password: str = Form(...),
+    db: Session = Depends(get_db) # Conexión a Neon
+):
+    identificacion_ingresada = identificacion.strip()
+
+    # Buscamos al usuario directamente en la base de datos Neon
+    usuario_encontrado = db.query(models.Usuario).filter(
+        models.Usuario.numero_identificacion == identificacion_ingresada
+    ).first()
+
+    # Validamos si existe y si coincide la contraseña
+    if usuario_encontrado and usuario_encontrado.clave == password:
+        return RedirectResponse(url=f"/inicio?user_id={identificacion_ingresada}", status_code=303)
+
+    return templates.TemplateResponse(
+        request,
+        "pages/login.html",
+        {
+            "error": "Revisa la identificación y la contraseña.",
+        },
+        status_code=401,
     )
-
-    if not valid_login:
-        return templates.TemplateResponse(
-            request,
-            "pages/login.html",
-            {
-                "error": "Revisa el correo y la contraseña. Usa los datos de ejemplo.",
-            },
-            status_code=401,
-        )
-
-    return RedirectResponse(url="/inicio", status_code=303)
 
 
 @app.get("/inicio", response_class=HTMLResponse)
-async def home(request: Request):
+async def home(request: Request, user_id: str = None, db: Session = Depends(get_db)):
+    # Buscamos los datos del estudiante en Neon para pintarlos en el Dashboard
+    estudiante = None
+    if user_id:
+        estudiante = db.query(models.Usuario).filter(models.Usuario.numero_identificacion == user_id).first()
+
+    # Si por alguna razón no se encuentra, mandamos un diccionario vacío o por defecto
+    identificacion_estudiante = estudiante.numero_identificacion if estudiante else "Invitado"
+    student_data = {
+        "nombre": "Estudiante",
+        "grupo": "Grupo actual",
+        "identificacion": identificacion_estudiante,
+    }
+
     return templates.TemplateResponse(
         request,
         "pages/dashboard.html",
         {
-            "student": STUDENT_DATABASE,
+            "student": student_data,
             "files": UPLOADED_FILES,
+            "group_files": GROUP_FILES,
             "upload_message": None,
         },
     )
 
 
 @app.post("/upload", response_class=HTMLResponse)
-async def upload_file(request: Request, archivo: UploadFile = File(...)):
+async def upload_file(request: Request, user_id: str = None, archivo: UploadFile = File(...), db: Session = Depends(get_db)):
     suffix = archivo.filename.rsplit(".", 1)[-1].upper() if "." in archivo.filename else "Archivo"
     UPLOADED_FILES.insert(
         0,
@@ -80,12 +104,25 @@ async def upload_file(request: Request, archivo: UploadFile = File(...)):
         },
     )
 
+    # Volvemos a buscar al estudiante para no perder la información al renderizar la vista
+    estudiante = None
+    if user_id:
+        estudiante = db.query(models.Usuario).filter(models.Usuario.numero_identificacion == user_id).first()
+        
+    identificacion_estudiante = estudiante.numero_identificacion if estudiante else "Invitado"
+    student_data = {
+        "nombre": "Estudiante",
+        "grupo": "Grupo actual",
+        "identificacion": identificacion_estudiante,
+    }
+
     return templates.TemplateResponse(
         request,
         "pages/dashboard.html",
         {
-            "student": STUDENT_DATABASE,
+            "student": student_data,
             "files": UPLOADED_FILES,
+            "group_files": GROUP_FILES,
             "upload_message": f"{archivo.filename} se agrego correctamente.",
         },
     )

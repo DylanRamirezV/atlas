@@ -24,6 +24,19 @@
     </div>
   </section>
 
+  <section id="archivos-grupo" class="screen" data-section="archivos-grupo">
+    <h1>Archivos del grupo</h1>
+    <p>Recursos compartidos por el grupo en el que te encuentras.</p>
+    <div class="cards-grid">
+      {% for file in group_files %}
+      <article class="card">
+        <h3>{{ file.nombre }}</h3>
+        <small>{{ file.tipo }} - {{ file.detalle }}</small>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
   <section id="subir" class="screen" data-section="subir">
     <h1>Subir archivos</h1>
     <p>Agrega recursos a tu lista de documentos academicos desde el menu lateral.</p>

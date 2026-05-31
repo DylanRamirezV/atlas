@@ -172,7 +172,10 @@ label {
   font-weight: 700;
 }
 
-input[type="email"],
+.login-card input,
+.upload-panel input,
+input[name="identificacion"],
+input[type="text"],
 input[type="password"],
 input[type="file"] {
   width: 100%;
