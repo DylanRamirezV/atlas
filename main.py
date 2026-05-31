@@ -6,6 +6,7 @@ from fastapi.templating import Jinja2Templates
 
 # Importamos lo necesario para conectar con Neon
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 from database import get_db
 import models
 
@@ -46,10 +47,30 @@ async def login(
 ):
     identificacion_ingresada = identificacion.strip()
 
-    # Buscamos al usuario directamente en la base de datos Neon
-    usuario_encontrado = db.query(models.Usuario).filter(
-        models.Usuario.numero_identificacion == identificacion_ingresada
-    ).first()
+    if db is None:
+        return templates.TemplateResponse(
+            request,
+            "pages/login.html",
+            {
+                "error": "La conexion con la base de datos no esta configurada en el servidor.",
+            },
+            status_code=503,
+        )
+
+    try:
+        # Buscamos al usuario directamente en la base de datos Neon
+        usuario_encontrado = db.query(models.Usuario).filter(
+            models.Usuario.numero_identificacion == identificacion_ingresada
+        ).first()
+    except SQLAlchemyError:
+        return templates.TemplateResponse(
+            request,
+            "pages/login.html",
+            {
+                "error": "No se pudo conectar con la base de datos. Revisa DATABASE_URL en Vercel.",
+            },
+            status_code=503,
+        )
 
     # Validamos si existe y si coincide la contraseña
     if usuario_encontrado and usuario_encontrado.clave == password:
@@ -69,8 +90,11 @@ async def login(
 async def home(request: Request, user_id: str = None, db: Session = Depends(get_db)):
     # Buscamos los datos del estudiante en Neon para pintarlos en el Dashboard
     estudiante = None
-    if user_id:
-        estudiante = db.query(models.Usuario).filter(models.Usuario.numero_identificacion == user_id).first()
+    if user_id and db is not None:
+        try:
+            estudiante = db.query(models.Usuario).filter(models.Usuario.numero_identificacion == user_id).first()
+        except SQLAlchemyError:
+            estudiante = None
 
     # Si por alguna razón no se encuentra, mandamos un diccionario vacío o por defecto
     identificacion_estudiante = estudiante.numero_identificacion if estudiante else "Invitado"
@@ -106,8 +130,11 @@ async def upload_file(request: Request, user_id: str = None, archivo: UploadFile
 
     # Volvemos a buscar al estudiante para no perder la información al renderizar la vista
     estudiante = None
-    if user_id:
-        estudiante = db.query(models.Usuario).filter(models.Usuario.numero_identificacion == user_id).first()
+    if user_id and db is not None:
+        try:
+            estudiante = db.query(models.Usuario).filter(models.Usuario.numero_identificacion == user_id).first()
+        except SQLAlchemyError:
+            estudiante = None
         
     identificacion_estudiante = estudiante.numero_identificacion if estudiante else "Invitado"
     student_data = {
