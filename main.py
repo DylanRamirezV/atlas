@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from fastapi import FastAPI, File, Form, Request, UploadFile, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -7,7 +8,7 @@ from fastapi.templating import Jinja2Templates
 # Importamos lo necesario para conectar con Neon
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-from database import get_db
+from database import Base, SessionLocal, engine, get_db
 import models
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -16,6 +17,41 @@ app = FastAPI(title="ATLAS")
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
+
+
+@app.on_event("startup")
+def prepare_database():
+    if engine is None or SessionLocal is None:
+        return
+
+    try:
+        Base.metadata.create_all(bind=engine)
+    except SQLAlchemyError:
+        return
+
+    login_id = os.getenv("ATLAS_LOGIN_ID")
+    login_password = os.getenv("ATLAS_LOGIN_PASSWORD")
+    if not login_id or not login_password:
+        return
+
+    db = SessionLocal()
+    try:
+        user = db.query(models.Usuario).filter(
+            models.Usuario.numero_identificacion == login_id
+        ).first()
+        if user:
+            user.clave = login_password
+        else:
+            user = models.Usuario(
+                numero_identificacion=login_id,
+                clave=login_password,
+            )
+            db.add(user)
+        db.commit()
+    except SQLAlchemyError:
+        db.rollback()
+    finally:
+        db.close()
 
 UPLOADED_FILES = [
     {"nombre": "Guia de estudio", "tipo": "PDF", "detalle": "Semana 4"},
