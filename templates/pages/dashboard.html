@@ -6,63 +6,105 @@
 {% include "partials/topbar.html" %}
 {% include "partials/sidebar.html" %}
 
-<main>
-  <section>
-    <h1>Hola, {{ student.nombre }}</h1>
-  </section>
+<main class="dashboard-shell">
+  <section class="dashboard-grid">
+    <section id="panel-admin" class="portal-panel portal-panel--admin">
+      <div class="portal-panel__header">
+        <span class="portal-pill">Administrador</span>
+        <h2>Panel de administración</h2>
+      </div>
 
-  <section id="archivos" class="screen" data-section="archivos">
-    <h1>Mis archivos</h1>
-    <p>Listado de documentos, tareas y recursos del curso.</p>
-    <div class="cards-grid">
-      {% for file in files %}
-      <article class="card">
-        <h3>{{ file.nombre }}</h3>
-        <small>{{ file.tipo }} - {{ file.detalle }}</small>
-      </article>
-      {% endfor %}
-    </div>
-  </section>
+      <div class="admin-access-card">
+        <p class="eyebrow">Acceso exclusivo</p>
+        <p>Inicio de sesión. Usa las credenciales de ejemplo o las tuyas.</p>
 
-  <section id="subir" class="screen" data-section="subir">
-    <h1>Subir archivos</h1>
-    <p>Agrega recursos a tu lista de documentos academicos desde el menu lateral.</p>
-    {% if upload_message %}
-    <p class="success">{{ upload_message }}</p>
-    {% endif %}
-    <form class="upload-panel" action="/upload" method="post" enctype="multipart/form-data">
-      <label for="archivo">Selecciona un archivo</label>
-      <input id="archivo" name="archivo" type="file" required />
-      <button type="submit">Subir archivo</button>
-    </form>
-  </section>
+        <form class="admin-login-form" action="#" method="post" autocomplete="off">
+          <label for="admin-user">Usuario</label>
+          <input id="admin-user" name="username" type="text" placeholder="profesor o estudiante" />
 
-  <section id="proyecto" class="screen" data-section="proyecto">
-    <h1>Sobre nuestro proyecto</h1>
-    <p>Descripcion general, objetivos y avance de la iniciativa educativa.</p>
-    <div class="cards-grid">
-      <article class="card">
-        <h3>Objetivo</h3>
-        <small>Centralizar recursos academicos en un panel sencillo.</small>
-      </article>
-      <article class="card">
-        <h3>Avance</h3>
-        <small>Interfaz funcional con estudiante simulado.</small>
-      </article>
-    </div>
-  </section>
+          <label for="admin-pass">Contraseña</label>
+          <input id="admin-pass" name="password" type="password" placeholder="contraseña" />
 
-  <section id="institucional" class="screen" data-section="institucional">
-    <h1>Institucional</h1>
-    <p>Informacion oficial, anuncios y politicas de la plataforma.</p>
-    <div class="cards-grid">
-      {% for file in institutional_files %}
-      <article class="card">
-        <h3>{{ file.nombre }}</h3>
-        <small>{{ file.tipo }} - {{ file.detalle }}</small>
-      </article>
-      {% endfor %}
-    </div>
+          <button type="submit">Iniciar sesión</button>
+        </form>
+
+        <p class="muted-note"><strong>Credenciales de ejemplo</strong>: profesor / administrador uno — estudiante / once tres</p>
+      </div>
+
+      <section id="subir" class="admin-upload-panel">
+        <h3>Subir archivos</h3>
+        <p>Gestiona recursos, tareas y materiales para el grupo.</p>
+        {% if upload_message %}
+        <p class="success">{{ upload_message }}</p>
+        {% endif %}
+        <div id="upload-locked-note" class="muted-note">Acceso restringido: inicia sesión como administrador para activar la subida.</div>
+        <form id="upload-form" class="upload-panel" action="/upload" method="post" enctype="multipart/form-data">
+          <label for="archivo">Selecciona un archivo</label>
+          <input id="archivo" name="archivo" type="file" required />
+          <button type="submit">Subir archivo</button>
+        </form>
+      </section>
+    </section>
+
+    <section id="panel-estudiante" class="portal-panel portal-panel--student">
+      <div class="portal-panel__header">
+        <span class="portal-pill portal-pill--student">Estudiante</span>
+        <h2>Panel del estudiante</h2>
+      </div>
+
+      <section class="student-overview">
+        <p class="eyebrow">Sesión 11-3</p>
+        <h3>Hola, {{ student.nombre }}</h3>
+        <p>{{ student.grupo }}</p>
+      </section>
+
+      <section id="archivos" class="content-block">
+        <h3>Mis archivos</h3>
+        <p>Listado de documentos, tareas y recursos del curso.</p>
+        <div class="cards-grid">
+          {% for file in files %}
+          <article class="card">
+            <h3>{{ file.nombre }}</h3>
+            <small>{{ file.tipo }} - {{ file.detalle }}</small>
+          </article>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section id="proyecto" class="content-block">
+        <h3>Sobre nuestro proyecto</h3>
+        <p>Descripcion general, objetivos y avance de la iniciativa educativa.</p>
+        <div class="cards-grid">
+          <article class="card">
+            <h3>Objetivo</h3>
+            <small>Centralizar recursos academicos en un panel sencillo.</small>
+          </article>
+          <article class="card">
+            <h3>Avance</h3>
+            <small>Interfaz funcional con estudiante simulado.</small>
+          </article>
+        </div>
+      </section>
+
+      <section id="institucional" class="content-block">
+        <h3>Institucional</h3>
+        <p>Informacion oficial, anuncios y politicas de la plataforma.</p>
+        <div class="cards-grid">
+          <article class="card">
+            <h3>Calendario academico</h3>
+            <small>Actualizado hoy</small>
+          </article>
+          <article class="card">
+            <h3>Comunicado oficial</h3>
+            <small>Normas y anuncios</small>
+          </article>
+          <article class="card">
+            <h3>Bienestar estudiantil</h3>
+            <small>Servicios disponibles</small>
+          </article>
+        </div>
+      </section>
+    </section>
   </section>
 </main>
 {% endblock %}
