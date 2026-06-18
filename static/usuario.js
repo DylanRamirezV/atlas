@@ -26,7 +26,7 @@
     content.appendChild(createCard('Tu agenda académica', 'Revisa tus tareas, archivos y recursos sin ver opciones de administrador.'));
     content.appendChild(createCard('Novedades', 'Encuentra los contenidos más relevantes organizados en forma de revista.'));
     content.appendChild(createCard('Rutina de estudio', 'Céntrate en tus materias con un diseño limpio y directo.'));
-  } else if(role === 'professor') {
+  } else if(normalizedRole === 'professor') {
     content.innerHTML = '';
     content.appendChild(createCard('Gestión docente', 'Administra clases, recursos y notas con un estilo profesional.'));
     content.appendChild(createCard('Publicaciones', 'Agrega y revisa materiales sin mezclar con el panel de administrador.'));
