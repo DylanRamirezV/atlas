@@ -20,11 +20,11 @@
     {% endif %}
 
     <form action="/login" method="post">
-      <label for="id">Numero de identificacion</label>
-      <input id="id" name="id" type="text" autocomplete="identifier" placeholder="123456789" required />
+      <label for="id">Usuario</label>
+      <input id="id" name="id" type="text" autocomplete="username" placeholder="nombreusuario" required />
 
       <label for="password">Contraseña</label>
-      <input id="password" name="password" type="password" autocomplete="current-password" placeholder="ejemplo1" required />
+      <input id="password" name="password" type="password" autocomplete="current-password" placeholder="123456789" required />
 
       <button type="submit">Entrar a ATLAS</button>
     </form>
@@ -32,10 +32,10 @@
     <details class="login-help">
       <summary>No sabes como iniciar sesion, click aqui</summary>
       <ol>
-        <li>Escribe el numero de identificacion dado por la plataforma.</li>
-        <li>Ingresa tu contrasena academica.</li>
-        <li>Para esta simulacion usa: 123456789 y 123456789.</li>
-        <li>Como profesor usa: 123456789 y 123456789.</li>
+        <li>Escribe tu usuario de la plataforma.</li>
+        <li>Ingresa tu contraseña.</li>
+        <li>Para esta simulación usa: usuario y 123456789.</li>
+        <li>Como profesor usa: usuario y 123456789.</li>
         <li>Presiona Entrar a ATLAS para abrir tu panel.</li>
       </ol>
     </details>
