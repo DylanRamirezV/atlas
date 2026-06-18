@@ -18,6 +18,24 @@
     </div>
   </section>
 
+  <!-- Barra de búsqueda -->
+  <section class="search-section">
+    <input type="text" id="search-input" class="search-bar" placeholder="Buscar archivos, recursos, actividades...">
+  </section>
+
+  <!-- Formulario de subida para profesor -->
+  <section id="upload-section" class="upload-section" style="display: none;">
+    <article class="upload-card">
+      <h2>Subir archivo</h2>
+      <form id="upload-form" method="post" action="/admin/upload" enctype="multipart/form-data">
+        <label for="file-input">Selecciona un archivo:</label>
+        <input type="file" id="file-input" name="archivo" required />
+        <button type="submit">Subir</button>
+      </form>
+    </article>
+  </section>
+
+  <!-- Contenido dinámico -->
   <section class="usuario-panels" id="usuario-content">
     <article class="usuario-card usuario-card--notice">
       <h2>Tu vista no está cargada</h2>
