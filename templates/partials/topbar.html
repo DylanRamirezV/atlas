@@ -1,19 +1,16 @@
 <header>
   <nav aria-label="Barra superior">
     <div class="brand">
-      <button type="button" class="icon-button" id="sidebar-toggle" aria-label="Mostrar menu">
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-      </button>
       <div>
         <strong>ATLAS</strong>
-        <span class="session-tag">Sesión 11-3</span>
+        <span class="session-tag">{% if student %}Sesión 11-3{% else %}Plataforma educativa{% endif %}</span>
       </div>
     </div>
+    {% if student %}
     <div class="student-data" aria-label="Datos del usuario">
       <span>{{ student.nombre }}</span>
       <strong>{{ student.grupo }}</strong>
     </div>
+    {% endif %}
   </nav>
 </header>

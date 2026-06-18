@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Panel de Usuario | ATLAS{% endblock %}
+
+{% block body %}
+{% include "partials/topbar.html" %}
+
+<main class="usuario-shell">
+  <section class="usuario-hero">
+    <div class="usuario-hero__summary">
+      <p class="eyebrow">Panel de usuario</p>
+      <h1>Bienvenido a ATLAS</h1>
+      <p id="usuario-description">Carga el perfil para ver tu espacio académico.</p>
+    </div>
+    <div class="usuario-hero__meta">
+      <span class="session-tag">Sesión segura</span>
+      <p id="usuario-role">Rol: -</p>
+    </div>
+  </section>
+
+  <section class="usuario-panels" id="usuario-content">
+    <article class="usuario-card usuario-card--notice">
+      <h2>Tu vista no está cargada</h2>
+      <p>Inicia sesión con el código correcto para ver el contenido de Estudiante o Profesor.</p>
+    </article>
+  </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='usuario.js') }}"></script>
+{% endblock %}

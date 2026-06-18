@@ -47,80 +47,74 @@ async def login_page(request: Request):
 
 @app.post("/login", response_class=HTMLResponse)
 async def login(
-    request: Request, 
-    id: str = Form(...),       # El HTML envía 'email', pero aquí leerá el numero_identificacion
-    password: str = Form(...),    # Lee 'contrasena'
-    db: Session = Depends(get_db)  # Conexión a Neon
+    request: Request,
+    code: str = Form(...),
+    role: str = Form(...),
 ):
-    # Convertimos la entrada a número entero ya que numero_identificacion ahora es BIGINT
-    try:
-        identificacion_ingresada = int(id.strip())
-    except ValueError:
+    codigo_valido = code.strip()
+    if not codigo_valido.isdigit() or len(codigo_valido) != 9:
         return templates.TemplateResponse(
             request,
             "pages/login.html",
-            {"error": "El número de identificación debe contener solo números."},
+            {"error": "El código debe ser un número de 9 dígitos."},
             status_code=400,
         )
 
-    profesor = TEACHER_ACCOUNTS.get(identificacion_ingresada)
-    if profesor and profesor["contrasena"] == password:
-        return RedirectResponse(url=f"/profesor?teacher_id={identificacion_ingresada}", status_code=303)
+    if codigo_valido != "123456789":
+        return templates.TemplateResponse(
+            request,
+            "pages/login.html",
+            {"error": "Código incorrecto. Usa 123456789."},
+            status_code=401,
+        )
 
-    # Buscamos al estudiante en Neon utilizando el número de identificación
-    usuario_encontrado = db.query(models.Usuario).filter(
-        models.Usuario.numero_identificacion == identificacion_ingresada
-    ).first()
+    if role not in {"student", "professor", "admin"}:
+        return templates.TemplateResponse(
+            request,
+            "pages/login.html",
+            {"error": "Selecciona Estudiante, Profesor o Administrador."},
+            status_code=400,
+        )
 
-    # Validamos si existe el usuario y si coincide la contraseña textual ingresada
-    if usuario_encontrado and usuario_encontrado.contrasena == password:
-        # Redireccionamos pasando el número de identificación en la URL para mantener el estado del usuario
-        return RedirectResponse(url=f"/inicio?user_id={identificacion_ingresada}", status_code=303)
+    if role == "admin":
+        return RedirectResponse(url="/admin", status_code=303)
 
+    return RedirectResponse(url="/usuario", status_code=303)
+
+
+@app.get("/usuario", response_class=HTMLResponse)
+async def user_panel(request: Request):
+    return templates.TemplateResponse(request, "pages/usuario.html", {})
+
+
+@app.post("/admin/upload", response_class=HTMLResponse)
+async def admin_upload(request: Request, archivo: UploadFile = File(...)):
+    suffix = archivo.filename.rsplit(".", 1)[-1].upper() if "." in archivo.filename else "Archivo"
+    UPLOADED_FILES.insert(
+        0,
+        {
+            "nombre": archivo.filename,
+            "tipo": suffix,
+            "detalle": "Subido en esta sesion",
+        },
+    )
     return templates.TemplateResponse(
         request,
-        "pages/login.html",
+        "pages/admin.html",
         {
-            "error": "Revisa la identificación y la contraseña. Usa los datos de la base de datos.",
+            "message": f"{archivo.filename} se agregó correctamente.",
         },
-        status_code=401,
     )
+
+
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_panel(request: Request, message: str = None):
+    return templates.TemplateResponse(request, "pages/admin.html", {"message": message})
 
 
 @app.get("/inicio", response_class=HTMLResponse)
-async def home(request: Request, user_id: int = None, db: Session = Depends(get_db)):
-    student_data = None
-    
-    if user_id:
-        # Buscamos al estudiante con el ID provisto en la URL
-        estudiante = db.query(models.Usuario).filter(models.Usuario.numero_identificacion == user_id).first()
-        
-        if estudiante:
-            # Armamos el diccionario dinámico respetando los nombres de variables que usa tu archivo HTML
-            student_data = {
-                "correo": str(estudiante.numero_identificacion),
-                "nombre": estudiante.nombre,
-                "grupo": f"Grupo {estudiante.grupo} - {estudiante.tecnica}",
-            }
-
-    # Si ocurre un acceso directo sin iniciar sesión, usamos un objeto temporal por seguridad
-    if not student_data:
-        student_data = {
-            "correo": "No identificado",
-            "nombre": "Invitado",
-            "grupo": "Sin asignar",
-        }
-
-    return templates.TemplateResponse(
-        request,
-        "pages/dashboard.html",
-        {
-            "student": student_data,
-            "files": UPLOADED_FILES,
-            "institutional_files": INSTITUTIONAL_FILES,
-            "upload_message": None,
-        },
-    )
+async def home(request: Request):
+    return RedirectResponse(url="/usuario", status_code=303)
 
 
 @app.post("/upload", response_class=HTMLResponse)
