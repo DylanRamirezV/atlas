@@ -17,10 +17,11 @@
     return;
   }
 
-  if(roleLabel) roleLabel.textContent = `Rol: ${role === 'professor' ? 'Profesor' : 'Estudiante'}`;
-  if(description) description.textContent = `Vista de ${role === 'professor' ? 'profesor' : 'estudiante'} activada.`;
+  const normalizedRole = role === 'admin' ? 'professor' : role;
+  if(roleLabel) roleLabel.textContent = `Rol: ${normalizedRole === 'professor' ? 'Profesor' : 'Estudiante'}`;
+  if(description) description.textContent = `Vista de ${normalizedRole === 'professor' ? 'profesor' : 'estudiante'} activada.`;
 
-  if(role === 'student') {
+  if(normalizedRole === 'student') {
     content.innerHTML = '';
     content.appendChild(createCard('Tu agenda académica', 'Revisa tus tareas, archivos y recursos sin ver opciones de administrador.'));
     content.appendChild(createCard('Novedades', 'Encuentra los contenidos más relevantes organizados en forma de revista.'));

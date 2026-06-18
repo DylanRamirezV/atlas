@@ -72,12 +72,12 @@ async def login(
         return templates.TemplateResponse(
             request,
             "pages/login.html",
-            {"error": "Selecciona Estudiante, Profesor o Administrador."},
+            {"error": "Selecciona Estudiante o Profesor."},
             status_code=400,
         )
 
     if role == "admin":
-        return RedirectResponse(url="/admin", status_code=303)
+        role = "professor"
 
     return RedirectResponse(url="/usuario", status_code=303)
 
@@ -108,8 +108,8 @@ async def admin_upload(request: Request, archivo: UploadFile = File(...)):
 
 
 @app.get("/admin", response_class=HTMLResponse)
-async def admin_panel(request: Request, message: str = None):
-    return templates.TemplateResponse(request, "pages/admin.html", {"message": message})
+async def admin_panel(request: Request):
+    return RedirectResponse(url="/usuario", status_code=303)
 
 
 @app.get("/inicio", response_class=HTMLResponse)

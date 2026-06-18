@@ -12,7 +12,7 @@
 
     if(code.length === 9 && /^\d{9}$/.test(code) && ['student','professor','admin'].includes(role)) {
       localStorage.setItem('atlasUserCode', code);
-      localStorage.setItem('atlasUserRole', role);
+      localStorage.setItem('atlasUserRole', role === 'admin' ? 'professor' : role);
     }
   });
 })();
