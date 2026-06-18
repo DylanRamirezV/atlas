@@ -508,6 +508,30 @@ main {
   padding: 20px;
 }
 
+/* Inicio: control de acceso visual para subida de archivos */
+#upload-locked-note {
+  margin-top: 12px;
+}
+
+#upload-form {
+  /* por defecto mantenemos el formulario visible pero inactivo; JS bloqueará envío si no autenticado */
+}
+
+.portal-panel.admin-unlocked #upload-locked-note {
+  display: none;
+}
+
+.portal-panel:not(.admin-unlocked) #upload-form button {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.portal-panel.admin-unlocked #upload-form button {
+  opacity: 1;
+  pointer-events: auto;
+}
+/* Fin: control de acceso visual */
+
 .admin-upload-panel h3,
 .content-block h3 {
   font-size: 1.15rem;
