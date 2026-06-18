@@ -1,8 +1,8 @@
 (function(){
   // Credenciales de ejemplo (solo cliente)
   const USERS = {
-    profesor: { role: 'admin', password: 'administrador uno', displayName: 'Profesor' },
-    estudiante: { role: 'student', password: 'once tres', displayName: 'Estudiante' }
+    profesor: { role: 'admin', password: '123456789', displayName: 'Profesor' },
+    estudiante: { role: 'student', password: '123456789', displayName: 'Estudiante' }
   };
 
   function $(sel){ return document.querySelector(sel); }
