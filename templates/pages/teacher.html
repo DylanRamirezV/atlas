@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Panel profesor | ATLAS{% endblock %}
+
+{% block body %}
+{% include "partials/topbar.html" %}
+{% include "partials/teacher_sidebar.html" %}
+
+<main class="teacher-layout">
+  <section id="subir-institucional" class="screen teacher-screen">
+    <h2>Subir archivo institucional</h2>
+    <p>Agrega un nuevo recurso o comunicado al apartado institucional.</p>
+
+    <form class="upload-panel" action="/profesor/institucional/subir" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="teacher_id" value="{{ teacher_id or 0 }}" />
+
+      <label for="archivo-institucional">Archivo</label>
+      <input id="archivo-institucional" name="archivo" type="file" required />
+
+      <label for="nombre">Nombre</label>
+      <input id="nombre" name="nombre" type="text" placeholder="Nombre visible opcional" />
+
+      <label for="detalle">Detalle</label>
+      <input id="detalle" name="detalle" type="text" placeholder="Descripcion corta" required />
+
+      <button type="submit">Agregar a institucional</button>
+    </form>
+  </section>
+
+  <section id="gestionar-institucional" class="screen teacher-screen">
+    <h2>Gestionar archivos institucionales</h2>
+    <p>Modifica o elimina los elementos visibles para estudiantes.</p>
+
+    <div class="teacher-manage-list">
+      {% for file in institutional_files %}
+      <article class="teacher-manage-item">
+        <form action="/profesor/institucional/editar" method="post">
+          <input type="hidden" name="teacher_id" value="{{ teacher_id or 0 }}" />
+          <input type="hidden" name="file_id" value="{{ file.id }}" />
+
+          <label for="nombre-{{ file.id }}">Nombre</label>
+          <input id="nombre-{{ file.id }}" name="nombre" type="text" value="{{ file.nombre }}" required />
+
+          <label for="tipo-{{ file.id }}">Tipo</label>
+          <input id="tipo-{{ file.id }}" name="tipo" type="text" value="{{ file.tipo }}" required />
+
+          <label for="detalle-{{ file.id }}">Detalle</label>
+          <input id="detalle-{{ file.id }}" name="detalle" type="text" value="{{ file.detalle }}" required />
+
+          <button type="submit">Guardar cambios</button>
+        </form>
+
+        <form class="delete-form" action="/profesor/institucional/eliminar" method="post">
+          <input type="hidden" name="teacher_id" value="{{ teacher_id or 0 }}" />
+          <input type="hidden" name="file_id" value="{{ file.id }}" />
+          <button class="danger-button" type="submit">Eliminar</button>
+        </form>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section id="institucional" class="screen teacher-screen">
+    <p class="eyebrow">Interfaz profesor</p>
+    <h1>Hola, {{ teacher.nombre }}</h1>
+    <p>Administra el contenido institucional que veran los estudiantes en su dashboard.</p>
+
+    {% if message %}
+    <p class="success">{{ message }}</p>
+    {% endif %}
+
+    <div class="cards-grid">
+      {% for file in institutional_files %}
+      <article class="card">
+        <h3>{{ file.nombre }}</h3>
+        <small>{{ file.tipo }} - {{ file.detalle }}</small>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='sidebar.js') }}"></script>
+{% endblock %}

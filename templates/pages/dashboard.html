@@ -56,18 +56,12 @@
     <h1>Institucional</h1>
     <p>Informacion oficial, anuncios y politicas de la plataforma.</p>
     <div class="cards-grid">
+      {% for file in institutional_files %}
       <article class="card">
-        <h3>Calendario academico</h3>
-        <small>Actualizado hoy</small>
+        <h3>{{ file.nombre }}</h3>
+        <small>{{ file.tipo }} - {{ file.detalle }}</small>
       </article>
-      <article class="card">
-        <h3>Comunicado oficial</h3>
-        <small>Normas y anuncios</small>
-      </article>
-      <article class="card">
-        <h3>Bienestar estudiantil</h3>
-        <small>Servicios disponibles</small>
-      </article>
+      {% endfor %}
     </div>
   </section>
 </main>

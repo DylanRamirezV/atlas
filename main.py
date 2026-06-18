@@ -25,6 +25,20 @@ UPLOADED_FILES = [
     {"nombre": "Proyecto final", "tipo": "Carpeta", "detalle": "Activo"},
 ]
 
+INSTITUTIONAL_FILES = [
+    {"id": 1, "nombre": "Calendario academico", "tipo": "Comunicado", "detalle": "Actualizado hoy"},
+    {"id": 2, "nombre": "Normas institucionales", "tipo": "PDF", "detalle": "Version vigente"},
+    {"id": 3, "nombre": "Bienestar estudiantil", "tipo": "Informacion", "detalle": "Servicios disponibles"},
+]
+
+TEACHER_ACCOUNTS = {
+    987654321: {
+        "nombre": "Profesor ATLAS",
+        "grupo": "Docente",
+        "contrasena": "profesor1",
+    }
+}
+
 
 @app.get("/", response_class=HTMLResponse)
 async def login_page(request: Request):
@@ -48,6 +62,10 @@ async def login(
             {"error": "El número de identificación debe contener solo números."},
             status_code=400,
         )
+
+    profesor = TEACHER_ACCOUNTS.get(identificacion_ingresada)
+    if profesor and profesor["contrasena"] == password:
+        return RedirectResponse(url=f"/profesor?teacher_id={identificacion_ingresada}", status_code=303)
 
     # Buscamos al estudiante en Neon utilizando el número de identificación
     usuario_encontrado = db.query(models.Usuario).filter(
@@ -99,6 +117,7 @@ async def home(request: Request, user_id: int = None, db: Session = Depends(get_
         {
             "student": student_data,
             "files": UPLOADED_FILES,
+            "institutional_files": INSTITUTIONAL_FILES,
             "upload_message": None,
         },
     )
@@ -140,6 +159,98 @@ async def upload_file(request: Request, user_id: int = None, archivo: UploadFile
         {
             "student": student_data,
             "files": UPLOADED_FILES,
+            "institutional_files": INSTITUTIONAL_FILES,
             "upload_message": f"{archivo.filename} se agrego correctamente.",
         },
     )
+
+
+@app.get("/profesor", response_class=HTMLResponse)
+async def teacher_dashboard(request: Request, teacher_id: int = None, message: str = None):
+    teacher_data = get_teacher_data(teacher_id)
+
+    return templates.TemplateResponse(
+        request,
+        "pages/teacher.html",
+        {
+            "student": teacher_data,
+            "teacher": teacher_data,
+            "institutional_files": INSTITUTIONAL_FILES,
+            "message": message,
+            "teacher_id": teacher_id,
+        },
+    )
+
+
+@app.post("/profesor/institucional/subir", response_class=HTMLResponse)
+async def teacher_upload_institutional(
+    teacher_id: int = Form(None),
+    archivo: UploadFile = File(...),
+    nombre: str = Form(None),
+    detalle: str = Form(...),
+):
+    suffix = archivo.filename.rsplit(".", 1)[-1].upper() if "." in archivo.filename else "Archivo"
+    INSTITUTIONAL_FILES.insert(
+        0,
+        {
+            "id": get_next_institutional_id(),
+            "nombre": nombre or archivo.filename,
+            "tipo": suffix,
+            "detalle": detalle,
+        },
+    )
+    return RedirectResponse(url=f"/profesor?teacher_id={teacher_id}&message=Archivo%20agregado", status_code=303)
+
+
+@app.post("/profesor/institucional/editar", response_class=HTMLResponse)
+async def teacher_edit_institutional(
+    teacher_id: int = Form(None),
+    file_id: int = Form(...),
+    nombre: str = Form(...),
+    tipo: str = Form(...),
+    detalle: str = Form(...),
+):
+    institutional_file = find_institutional_file(file_id)
+    if institutional_file:
+        institutional_file["nombre"] = nombre
+        institutional_file["tipo"] = tipo
+        institutional_file["detalle"] = detalle
+
+    return RedirectResponse(url=f"/profesor?teacher_id={teacher_id}&message=Archivo%20actualizado", status_code=303)
+
+
+@app.post("/profesor/institucional/eliminar", response_class=HTMLResponse)
+async def teacher_delete_institutional(
+    teacher_id: int = Form(None),
+    file_id: int = Form(...),
+):
+    global INSTITUTIONAL_FILES
+    INSTITUTIONAL_FILES = [file for file in INSTITUTIONAL_FILES if file["id"] != file_id]
+    return RedirectResponse(url=f"/profesor?teacher_id={teacher_id}&message=Archivo%20eliminado", status_code=303)
+
+
+def get_teacher_data(teacher_id):
+    teacher = TEACHER_ACCOUNTS.get(teacher_id)
+    if not teacher:
+        return {
+            "nombre": "Profesor invitado",
+            "grupo": "Docente",
+        }
+
+    return {
+        "nombre": teacher["nombre"],
+        "grupo": teacher["grupo"],
+    }
+
+
+def get_next_institutional_id():
+    if not INSTITUTIONAL_FILES:
+        return 1
+    return max(file["id"] for file in INSTITUTIONAL_FILES) + 1
+
+
+def find_institutional_file(file_id):
+    for institutional_file in INSTITUTIONAL_FILES:
+        if institutional_file["id"] == file_id:
+            return institutional_file
+    return None
