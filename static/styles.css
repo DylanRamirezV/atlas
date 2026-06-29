@@ -522,21 +522,6 @@ main {
   }
 
 }
-.teacher-layout .teacher-screen {
-  display: none !important;
-}
-
-.teacher-layout:not(:has(.teacher-screen:target)) #institucional {
-  display: block !important;
-}
-
-.teacher-layout:has(.teacher-screen:target) .teacher-screen {
-  display: none !important;
-}
-
-.teacher-layout .teacher-screen:target {
-  display: block !important;
-}
 
 /* 1. Ocultamos todas las pantallas por defecto */
 .teacher-screen {
