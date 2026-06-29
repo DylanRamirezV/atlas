@@ -7,14 +7,22 @@
 
   function openSidebar() {
     body.classList.add("sidebar-open");
-    sidebar.setAttribute("aria-hidden", "false");
-    backdrop.setAttribute("aria-hidden", "false");
+    if (sidebar) {
+      sidebar.setAttribute("aria-hidden", "false");
+    }
+    if (backdrop) {
+      backdrop.setAttribute("aria-hidden", "false");
+    }
   }
 
   function closeSidebar() {
     body.classList.remove("sidebar-open");
-    sidebar.setAttribute("aria-hidden", "true");
-    backdrop.setAttribute("aria-hidden", "true");
+    if (sidebar) {
+      sidebar.setAttribute("aria-hidden", "true");
+    }
+    if (backdrop) {
+      backdrop.setAttribute("aria-hidden", "true");
+    }
   }
 
   function setInitialState() {
@@ -25,15 +33,19 @@
     }
   }
 
-  toggle.addEventListener("click", function () {
-    if (body.classList.contains("sidebar-open")) {
-      closeSidebar();
-    } else {
-      openSidebar();
-    }
-  });
+  if (toggle) {
+    toggle.addEventListener("click", function () {
+      if (body.classList.contains("sidebar-open")) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
+    });
+  }
 
-  backdrop.addEventListener("click", closeSidebar);
+  if (backdrop) {
+    backdrop.addEventListener("click", closeSidebar);
+  }
 
   window.addEventListener("keydown", function (event) {
     if (event.key === "Escape") {
@@ -41,7 +53,7 @@
     }
   });
 
-  var sidebarLinks = sidebar.querySelectorAll("a");
+  var sidebarLinks = sidebar ? sidebar.querySelectorAll("a") : [];
   sidebarLinks.forEach(function (link) {
     link.addEventListener("click", function () {
       if (window.innerWidth < desktopMin) {
@@ -50,6 +62,27 @@
     });
   });
 
+  var screens = document.querySelectorAll(".screen[data-section]");
+
+  function showSelectedScreen() {
+    if (!screens.length) {
+      return;
+    }
+
+    var selectedId = window.location.hash.replace("#", "") || "institucional";
+    var selectedScreen = document.getElementById(selectedId);
+
+    if (!selectedScreen || !selectedScreen.matches(".screen[data-section]")) {
+      selectedId = "institucional";
+    }
+
+    screens.forEach(function (screen) {
+      screen.style.display = screen.id === selectedId ? "block" : "none";
+    });
+  }
+
   window.addEventListener("resize", setInitialState);
+  window.addEventListener("hashchange", showSelectedScreen);
   setInitialState();
+  showSelectedScreen();
 })();

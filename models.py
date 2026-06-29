@@ -10,3 +10,4 @@ class Usuario(Base):
     tecnica = Column(String(100), nullable=False)
     numero_identificacion = Column(BigInteger, unique=True, nullable=False, index=True)
     contrasena = Column(String(255), nullable=False)
+    rol = Column(String(20), nullable=False, default="Estudiante") 

@@ -6,144 +6,146 @@
 {% include "partials/topbar.html" %}
 {% include "partials/sidebar.html" %}
 
-<main class="dashboard-shell">
-  <section class="dashboard-grid">
-    <section id="panel-admin" class="portal-panel portal-panel--admin">
-      <div class="portal-panel__header">
-        <span class="portal-pill">Administrador</span>
-        <h2>Panel de administración</h2>
-      </div>
+<main>
+  <section>
+    <h1>Hola, {{ student.nombre }}</h1>
+  </section>
 
-      <div class="panel-magazine-layout panel-magazine-layout--admin">
-        <article class="magazine-card magazine-card--editorial">
-          <span class="magazine-eyebrow">Edición profesor</span>
-          <h3>Gestión editorial de recursos</h3>
-          <p>Diseña el contenido académico, publica materiales y administra el aula con una estética de revista profesional.</p>
-          <div class="magazine-meta">
-            <span>Autor: Profesor</span>
-            <span>Publicación: Actual</span>
-          </div>
-          <div class="magazine-highlight">
-            <p>El contenido de la plataforma se administra desde aquí. Inicia sesión y controla las entregas disponibles para los estudiantes.</p>
-          </div>
-        </article>
+<section id="archivos" class="screen" data-section="archivos">
+    <h1>Mis archivos</h1>
+    <p>Listado de documentos, tareas y recursos tuyos.</p>
+    
+<div class="cards-grid">
+    {% for file in files %}
+    <article class="card" style="position: relative;">
+     <h3>{{ file.nombre }}</h3>
+    <small>{{ file.tipo if file.tipo else "Archivo" }} {{ " - " ~ file.detalle if file.detalle else "" }}</small>
+  
+    <!-- BOTÓN PARA ELIMINAR ARCHIVO PERSONAL -->
+      <form action="/delete" method="post" style="display:inline; float: right;">
+      <input type="hidden" name="nombre_archivo" value="{{ file.nombre }}">
+             <button type="submit" style="background: none; border: none; color: red; cursor: pointer; font-size: 14px;" title="Eliminar archivo">
+               ❌ Eliminar
+             </button>
+      </form>
+    </article>
+        {% endfor %}
+ </div>
+    
+    <div class="upload-widget">
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="destino" value="personal">
+            
+            <!-- Este conserva el id="fileInput" en exclusiva para la pestaña personal -->
+            <input type="file" name="archivo" id="fileInput" style="display: none;" onchange="this.form.submit()">
+            
+            <button type="button" class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                <span class="icon">📁</span> Subir Archivo
+            </button>
+        </form>
+    </div>
+</section>
 
-        <aside class="magazine-side magazine-side--admin">
-          <div class="admin-access-card">
-            <p class="eyebrow">Acceso exclusivo</p>
-            <p>Inicio de sesión. Usa las credenciales de ejemplo o las tuyas.</p>
+<style>
+    .upload-widget {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+    }
 
-            <form class="admin-login-form" action="#" method="post" autocomplete="off">
-              <label for="admin-user">Usuario</label>
-              <input id="admin-user" name="username" type="text" placeholder="profesor o estudiante" />
+    .upload-btn {
+        background-color: #2563eb;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        font-family: sans-serif;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
 
-              <label for="admin-pass">Contraseña</label>
-              <input id="admin-pass" name="password" type="password" placeholder="contraseña" />
+    .upload-btn:hover {
+        background-color: #1d4ed8;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+</style>
+  </section>
 
-              <button type="submit">Iniciar sesión</button>
-            </form>
+  <section id="proyecto" class="screen" data-section="proyecto">
+    <h1>Sobre nuestro proyecto</h1>
+    <p>Descripcion general, objetivos y avance de la iniciativa educativa.</p>
+    <div class="cards-grid">
+      <article class="card">
+        <h3>Objetivo</h3>
+        <small>Centralizar recursos academicos en un panel sencillo.</small>
+      </article>
+      <article class="card">
+        <h3>Avance</h3>
+        <small>Interfaz funcional con estudiante simulado.</small>
+      </article>
+    </div>
+  </section>
 
-            <p class="muted-note"><strong>Credenciales de ejemplo</strong>: profesor / 123456789 — estudiante / 123456789</p>
-          </div>
+<section id="grupo" class="screen" data-section="grupo">
+  <h1>Archivos de {{ student.grupo }} </h1>
+  <p>Listado de documentos, tareas y recursos del curso.</p>
+  
+  <div class="cards-grid">
+{% for file in group_files %}
+<article class="card" style="position: relative;">
+  <h3>{{ file.nombre }}</h3>
+  <small>{{ file.tipo if file.tipo else "Archivo" }} {{ " - " ~ file.detalle if file.detalle else "" }}</small>
+  
+  <!-- BOTÓN PARA ELIMINAR ARCHIVO GRUPAL -->
+  <form action="/delete" method="post" style="display:inline; float: right;">
+      <input type="hidden" name="nombre_archivo" value="{{ file.nombre }}">
+      <button type="submit" style="background: none; border: none; color: red; cursor: pointer; font-size: 14px;" title="Eliminar archivo">
+          ❌ Eliminar
+      </button>
+  </form>
+</article>
+{% endfor %}
 
-          <section id="subir" class="admin-upload-panel">
-            <h3>Subir archivos</h3>
-            <p>Gestiona recursos, tareas y materiales para el grupo.</p>
-            {% if upload_message %}
-            <p class="success">{{ upload_message }}</p>
-            {% endif %}
-            <div id="upload-locked-note" class="muted-note">Acceso restringido: inicia sesión como administrador para activar la subida.</div>
-            <form id="upload-form" class="upload-panel" action="/upload" method="post" enctype="multipart/form-data">
-              <label for="archivo">Selecciona un archivo</label>
-              <input id="archivo" name="archivo" type="file" required />
-              <button type="submit">Subir archivo</button>
-            </form>
-          </section>
-        </aside>
-      </div>
-    </section>
+  </div>
 
-    <section id="panel-estudiante" class="portal-panel portal-panel--student">
-      <div class="portal-panel__header">
-        <span class="portal-pill portal-pill--student">Estudiante</span>
-        <h2>Revista del estudiante</h2>
-      </div>
+  <div class="upload-widget">
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="destino" value="grupal">
+        
+        <!-- CORRECCIÓN 2: Cambiado el id a 'fileInputGrupo' para que no choque con la otra pestaña -->
+        <input type="file" name="archivo" id="fileInputGrupo" style="display: none;" onchange="this.form.submit()">
+        
+        <!-- CORRECCIÓN 3: Cambiado el id en el onclick a 'fileInputGrupo' -->
+        <button type="button" class="upload-btn" onclick="document.getElementById('fileInputGrupo').click()">
+            <span class="icon">📁</span> Subir Archivo
+        </button>
+    </form>
+  </div>
+</section>
 
-      <div class="panel-magazine-layout panel-magazine-layout--student">
-        <article class="magazine-card magazine-card--feature">
-          <span class="magazine-eyebrow">Sesión 11-3</span>
-          <h3>Hola, {{ student.nombre }}</h3>
-          <p>{{ student.grupo }}</p>
-          <p class="magazine-intro">Bienvenido a tu espacio de estudio: artículos, tareas y recursos curados en un formato visual moderno.</p>
-        </article>
 
-        <aside class="magazine-side magazine-side--student">
-          <section class="student-quickfacts">
-            <h3>Tu foco</h3>
-            <ul>
-              <li>Investigación activa</li>
-              <li>Entregas pendientes</li>
-              <li>Eventos del curso</li>
-            </ul>
-          </section>
-          <section class="student-quote">
-            <p>"Aprender con estilo es también organizar mejor tus ideas."</p>
-          </section>
-        </aside>
-      </div>
-
-      <section id="archivos" class="content-block">
-        <h3>Mis archivos</h3>
-        <p>Listado de documentos, tareas y recursos del curso.</p>
-        <div class="cards-grid">
-          {% for file in files %}
-          <article class="card">
-            <h3>{{ file.nombre }}</h3>
-            <small>{{ file.tipo }} - {{ file.detalle }}</small>
-          </article>
-          {% endfor %}
-        </div>
-      </section>
-
-      <section id="proyecto" class="content-block">
-        <h3>Sobre nuestro proyecto</h3>
-        <p>Descripcion general, objetivos y avance de la iniciativa educativa.</p>
-        <div class="cards-grid">
-          <article class="card">
-            <h3>Objetivo</h3>
-            <small>Centralizar recursos academicos en un panel sencillo.</small>
-          </article>
-          <article class="card">
-            <h3>Avance</h3>
-            <small>Interfaz funcional con estudiante simulado.</small>
-          </article>
-        </div>
-      </section>
-
-      <section id="institucional" class="content-block">
-        <h3>Institucional</h3>
-        <p>Informacion oficial, anuncios y politicas de la plataforma.</p>
-        <div class="cards-grid">
-          <article class="card">
-            <h3>Calendario academico</h3>
-            <small>Actualizado hoy</small>
-          </article>
-          <article class="card">
-            <h3>Comunicado oficial</h3>
-            <small>Normas y anuncios</small>
-          </article>
-          <article class="card">
-            <h3>Bienestar estudiantil</h3>
-            <small>Servicios disponibles</small>
-          </article>
-        </div>
-      </section>
-    </section>
+  <section id="institucional" class="screen" data-section="institucional">
+    <h1>Institucional</h1>
+    <p>Informacion oficial, anuncios y politicas de la plataforma.</p>
+    <div class="cards-grid">
+      {% for file in institutional_files %}
+      <article class="card">
+        <h3>{{ file.nombre }}</h3>
+        <small>{{ file.tipo }} - {{ file.detalle }}</small>
+      </article>
+      {% endfor %}
+    </div>
   </section>
 </main>
 {% endblock %}
 
 {% block scripts %}
 <script src="{{ url_for('static', path='sidebar.js') }}"></script>
-<script src="{{ url_for('static', path='admin-login.js') }}"></script>
 {% endblock %}
