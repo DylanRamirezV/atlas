@@ -61,28 +61,4 @@
       }
     });
   });
-
-  var screens = document.querySelectorAll(".screen[data-section]");
-
-  function showSelectedScreen() {
-    if (!screens.length) {
-      return;
-    }
-
-    var selectedId = window.location.hash.replace("#", "") || "institucional";
-    var selectedScreen = document.getElementById(selectedId);
-
-    if (!selectedScreen || !selectedScreen.matches(".screen[data-section]")) {
-      selectedId = "institucional";
-    }
-
-    screens.forEach(function (screen) {
-      screen.style.display = screen.id === selectedId ? "block" : "none";
-    });
-  }
-
-  window.addEventListener("resize", setInitialState);
-  window.addEventListener("hashchange", showSelectedScreen);
-  setInitialState();
-  showSelectedScreen();
 })();

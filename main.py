@@ -58,7 +58,7 @@ async def login(
             rol_usuario = usuario.rol.strip().lower() if usuario.rol else "estudiante"
             
             if rol_usuario == "profesor":
-                response = RedirectResponse(url="/profesor", status_code=303)
+                response = RedirectResponse(url="/profesor#institucional", status_code=303)
             else:
                 response = RedirectResponse(url="/inicio", status_code=303)
             # --------------------------------------------------------------------

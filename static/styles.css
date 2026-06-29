@@ -523,17 +523,12 @@ main {
 
 }
 
-/* 1. Ocultamos todas las pantallas por defecto */
+/* 1. Ocultamos absolutamente todas las pantallas por defecto */
 .teacher-screen {
     display: none !important;
 }
 
-/* 2. Mostramos la sección institucional SÓLO si la URL no tiene ningún ancla (#) */
-body:not(:has(:target)) #institucional {
-    display: block !important;
-}
-
-/* 3. Cuando una sección específica es seleccionada mediante el ancla (#) */
+/* 2. Cuando una sección específica es el target activo en la URL, se muestra elegantemente */
 .teacher-screen:target {
     display: block !important;
 }
