@@ -537,3 +537,18 @@ main {
 .teacher-layout .teacher-screen:target {
   display: block !important;
 }
+
+/* 1. Ocultamos todas las pantallas por defecto */
+.teacher-screen {
+    display: none !important;
+}
+
+/* 2. Mostramos la sección institucional SÓLO si la URL no tiene ningún ancla (#) */
+body:not(:has(:target)) #institucional {
+    display: block !important;
+}
+
+/* 3. Cuando una sección específica es seleccionada mediante el ancla (#) */
+.teacher-screen:target {
+    display: block !important;
+}
