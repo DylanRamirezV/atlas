@@ -1,8 +1,5 @@
 # Documento de Diseño: Base de Datos de Seguimiento Académico
 
-**Por:** Carter Zenke  
-**Video resumen:** *(Normalmente aquí habría una URL, ¡pero no para esta tarea de muestra!)*
-
 ---
 
 ##  Alcance
