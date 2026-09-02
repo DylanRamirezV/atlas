@@ -18,9 +18,9 @@ app = FastAPI(title="ATLAS")
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
-# INICIALIZACIÓN DE LISTA GLOBAL
+# INICIALIZACIÓN DE LISTAS GLOBALES
 UPLOADED_FILES = []
-
+INSTITUTIONAL_FILES = []
 
 
 @app.get("/", response_class=HTMLResponse)
