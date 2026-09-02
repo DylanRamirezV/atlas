@@ -21,11 +21,7 @@ templates = Jinja2Templates(directory=BASE_DIR / "templates")
 # INICIALIZACIÓN DE LISTA GLOBAL
 UPLOADED_FILES = []
 
-# Datos estáticos (ejemplo)
-INSTITUTIONAL_FILES = [
-    {"id": 1, "nombre": "Calendario academico", "tipo": "Comunicado", "detalle": "Actualizado hoy"},
-    {"id": 2, "nombre": "Normas institucionales", "tipo": "PDF", "detalle": "Version vigente"},
-]
+
 
 @app.get("/", response_class=HTMLResponse)
 async def login_page(request: Request):
