@@ -4,16 +4,16 @@
 
 ## 🎯 Alcance
 
-La base de datos está diseñada para gestionar la administración de usuarios (administradores, profesores y estudiantes), la carga de recursos/archivos por parte de los profesores y el seguimiento de las descargas realizadas por los estudiantes.
+La base de datos está diseñada para gestionar la administración de usuarios (administradores, profesores y estudiantes), la carga de recursos/archivos por parte de los profesores y administradores, y el seguimiento de las descargas realizadas por estudiantes y profesores.
 
 El alcance de la base de datos incluye:
 
-* **Administradores (`ADMIN`):** Gestión de credenciales, roles y creación de cuentas de usuario.
+* **Administradores (`ADMIN`):** Gestión de credenciales, roles, creación de cuentas de usuario y subida directa de archivos.
 * **Usuarios (`USUARIO`):** Entidad central para autenticación y control de acceso (asociada a administradores, profesores y estudiantes).
 * **Profesores (`PROFESOR`):** Información sobre el cuerpo docente y las materias que imparten.
 * **Estudiantes (`ESTUDIANTE`):** Información de identificación del alumno y su grado académico.
-* **Archivos (`ARCHIVO`):** Registro de los materiales y documentos subidos por los profesores.
-* **Descargas (`DESCARGA`):** Registro de las descargas realizadas por los estudiantes sobre los archivos disponibles.
+* **Archivos (`ARCHIVO`):** Registro de los materiales y documentos subidos tanto por profesores como por administradores.
+* **Descargas (`DESCARGA`):** Registro de las descargas realizadas por los estudiantes y profesores sobre los archivos disponibles.
 
 > 🚫 **Fuera del alcance:** Evaluaciones, calificaciones, entregas de tareas por parte de alumnos, foros de discusión o pagos de colegiatura.
 
@@ -25,14 +25,14 @@ Esta base de datos soportará:
 
 * Operaciones **CRUD** para usuarios, administradores, profesores, estudiantes y archivos.
 * Autenticación centralizada mediante la tabla `USUARIO`.
-* Carga de archivos por parte de los profesores asociando título, descripción, URL y fecha.
-* Registro de auditoría o historial cada vez que un estudiante descarga un archivo (`DESCARGA`), guardando la fecha y hora exacta.
+* Carga de archivos por parte de los profesores y de los administradores asociando título, descripción, URL y fecha.
+* Registro de auditoría o historial cada vez que un estudiante o un profesor realiza una descarga sobre un archivo (`DESCARGA`), guardando la fecha y hora exacta.
 
 ---
 
 ## 📊 Representación
 
-Las entidades se capturan en tablas de **SQL** (compatibles con SQLite / PostgreSQL / MySQL) con el siguiente esquema extraído del diagrama:
+Las entidades se capturan en tablas de **SQL** (compatibles con SQLite / PostgreSQL / MySQL) con el siguiente esquema extraído directamente del diagrama ER:
 
 ### Entidades
 
@@ -104,15 +104,24 @@ Tabla asociativa/historial que registra las descargas efectuadas.
 
 ---
 
-### Relaciones
+### Relaciones Exactas del Diagrama
 
-A partir del diagrama Entidad-Relación proporcionado:
+A partir de la notación de pata de gallo (Crow's Foot) del diagrama ER proporcionado:
 
-* **ADMIN ↔ USUARIO (1:1 / 1:N):** Un `ADMIN` crea / tiene asignado un registro en `USUARIO`.
-* **USUARIO ↔ PROFESOR (1:1):** Un `USUARIO` tiene asociado un único registro de `PROFESOR`.
-* **USUARIO ↔ ESTUDIANTE (1:1):** Un `USUARIO` tiene asociado un único registro de `ESTUDIANTE`.
-* **PROFESOR ↔ ARCHIVO (1:N):** Un `PROFESOR` sube de `0` a muchos `ARCHIVOS`. Cada `ARCHIVO` pertenece a un único `PROFESOR`.
-* **ESTUDIANTE ↔ DESCARGA (1:N):** Un `ESTUDIANTE` realiza de `0` a muchas `DESCARGAS`.
-* **ARCHIVO ↔ DESCARGA (1:N):** Un `ARCHIVO` es descargado en `0` o muchas `DESCARGAS`.
-
----
+* **ADMIN ↔ USUARIO:**
+  * **Crea:** Un `ADMIN` crea de `0` a muchos (`1:N`) registros en `USUARIO`.
+  * **Tiene:** Un `ADMIN` se vincula con exactamente un (`1:1`) registro de `USUARIO`.
+* **USUARIO ↔ PROFESOR:**
+  * **Tiene:** Un `USUARIO` tiene exactamente un (`1:1`) perfil de `PROFESOR`.
+* **USUARIO ↔ ESTUDIANTE:**
+  * **Tiene:** Un `USUARIO` tiene exactamente un (`1:1`) perfil de `ESTUDIANTE`.
+* **ADMIN ↔ ARCHIVO:**
+  * **Sube:** Un `ADMIN` puede subir de `1` a muchos (`1:N`) archivos en `ARCHIVO`.
+* **PROFESOR ↔ ARCHIVO:**
+  * **Sube:** Un `PROFESOR` puede subir de `1` a muchos (`1:N`) archivos en `ARCHIVO`.
+* **PROFESOR ↔ DESCARGA:**
+  * **Realiza:** Un `PROFESOR` puede realizar de `1` a muchas (`1:N`) descargas registradas en `DESCARGA`.
+* **ESTUDIANTE ↔ DESCARGA:**
+  * **Realiza:** Un `ESTUDIANTE` realiza de `1` a muchas (`1:N`) descargas registradas en `DESCARGA`.
+* **ARCHIVO ↔ DESCARGA:**
+  * **Es descargado:** Un `ARCHIVO` puede estar presente en de `1` a muchas (`1:N`) instancias de `DESCARGA`.

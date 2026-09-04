@@ -1,45 +1,71 @@
--- 1. Representar los usuarios de la plataforma (estudiantes e instructores)
-CREATE TABLE IF NOT EXISTS "usuarios" (
+-- 1. Representar los administradores del sistema
+CREATE TABLE IF NOT EXISTS "ADMIN" (
     "id" SERIAL PRIMARY KEY,
-    "numero_identificacion" INTEGER UNIQUE NOT NULL,
+    "id_usuario" INTEGER,
+    "correo" VARCHAR(100) NOT NULL,
+    "contraseña" VARCHAR(255) NOT NULL,
+    "rol" VARCHAR(50) NOT NULL
+);
+
+-- 2. Representar los profesores
+CREATE TABLE IF NOT EXISTS "PROFESOR" (
+    "id" SERIAL PRIMARY KEY,
+    "id_usuario" INTEGER,
     "nombre" VARCHAR(100) NOT NULL,
-    "rol" VARCHAR(20) NOT NULL DEFAULT 'estudiante',
-    "grupo" VARCHAR(50),
-    "tecnica" VARCHAR(100),
-    "contrasena" VARCHAR(255) NOT NULL
+    "materia" VARCHAR(100) NOT NULL
 );
 
--- 2. Representar los problemas o actividades asignadas
-CREATE TABLE IF NOT EXISTS "problems" (
+-- 3. Representar los estudiantes (grados restringidos de 8° a 11°)
+CREATE TABLE IF NOT EXISTS "ESTUDIANTE" (
     "id" SERIAL PRIMARY KEY,
-    "problem_set" INTEGER NOT NULL,
-    "name" VARCHAR(100) NOT NULL
+    "id_usuario" INTEGER,
+    "nombre" VARCHAR(100) NOT NULL,
+    "grado" VARCHAR(10) NOT NULL CHECK ("grado" IN ('8°', '9°', '10°', '11°', '8', '9', '10', '11'))
 );
 
--- 3. Representar las entregas realizadas por los estudiantes
-CREATE TABLE IF NOT EXISTS "submissions" (
+-- 4. Representar la tabla central de usuarios (autenticación y vinculación de perfiles)
+CREATE TABLE IF NOT EXISTS "USUARIO" (
     "id" SERIAL PRIMARY KEY,
-    "student_id" INTEGER NOT NULL,
-    "problem_id" INTEGER NOT NULL,
-    "submission_path" TEXT NOT NULL,
-    "correctness" NUMERIC(3, 2) NOT NULL CHECK ("correctness" BETWEEN 0 AND 1),
-    "timestamp" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_student FOREIGN KEY ("student_id") REFERENCES "usuarios"("id") ON DELETE CASCADE,
-    CONSTRAINT fk_problem FOREIGN KEY ("problem_id") REFERENCES "problems"("id") ON DELETE CASCADE
+    "id_estudiante" INTEGER,
+    "id_profesor" INTEGER,
+    "id_admin" INTEGER,
+    "correo" VARCHAR(100) UNIQUE NOT NULL,
+    "contrasena" VARCHAR(255) NOT NULL,
+    "rol" VARCHAR(50) NOT NULL DEFAULT 'Estudiante',
+    CONSTRAINT fk_usuario_estudiante FOREIGN KEY ("id_estudiante") REFERENCES "ESTUDIANTE"("id") ON DELETE SET NULL,
+    CONSTRAINT fk_usuario_profesor FOREIGN KEY ("id_profesor") REFERENCES "PROFESOR"("id") ON DELETE SET NULL,
+    CONSTRAINT fk_usuario_admin FOREIGN KEY ("id_admin") REFERENCES "ADMIN"("id") ON DELETE SET NULL
 );
 
--- 4. Representar los comentarios dejados por instructores a las entregas
-CREATE TABLE IF NOT EXISTS "comments" (
-    "id" SERIAL PRIMARY KEY,
-    "instructor_id" INTEGER NOT NULL,
-    "submission_id" INTEGER NOT NULL,
-    "contents" TEXT NOT NULL,
-    CONSTRAINT fk_instructor FOREIGN KEY ("instructor_id") REFERENCES "usuarios"("id") ON DELETE CASCADE,
-    CONSTRAINT fk_submission FOREIGN KEY ("submission_id") REFERENCES "submissions"("id") ON DELETE CASCADE
+-- Claves foráneas cíclicas/inversas de los perfiles hacia usuario
+ALTER TABLE "ADMIN" ADD CONSTRAINT fk_admin_usuario FOREIGN KEY ("id_usuario") REFERENCES "USUARIO"("id") ON DELETE SET NULL;
+ALTER TABLE "PROFESOR" ADD CONSTRAINT fk_profesor_usuario FOREIGN KEY ("id_usuario") REFERENCES "USUARIO"("id") ON DELETE SET NULL;
+ALTER TABLE "ESTUDIANTE" ADD CONSTRAINT fk_estudiante_usuario FOREIGN KEY ("id_usuario") REFERENCES "USUARIO"("id") ON DELETE SET NULL;
+
+-- 5. Representar los archivos y recursos subidos por los profesores
+CREATE TABLE IF NOT EXISTS "ARCHIVO" (
+    "id_archivo" SERIAL PRIMARY KEY,
+    "id_profesor" INTEGER NOT NULL,
+    "titulo" VARCHAR(150) NOT NULL,
+    "descripcion" TEXT,
+    "url_archivo" TEXT NOT NULL,
+    "fecha_subida" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_archivo_profesor FOREIGN KEY ("id_profesor") REFERENCES "PROFESOR"("id") ON DELETE CASCADE
+);
+
+-- 6. Representar el historial de descargas realizadas por los estudiantes
+CREATE TABLE IF NOT EXISTS "DESCARGA" (
+    "id_descarga" SERIAL PRIMARY KEY,
+    "id_estudiante" INTEGER NOT NULL,
+    "id_archivo" INTEGER NOT NULL,
+    "fecha_descarga" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_descarga_estudiante FOREIGN KEY ("id_estudiante") REFERENCES "ESTUDIANTE"("id") ON DELETE CASCADE,
+    CONSTRAINT fk_descarga_archivo FOREIGN KEY ("id_archivo") REFERENCES "ARCHIVO"("id_archivo") ON DELETE CASCADE
 );
 
 -- Índices para optimizar las búsquedas más frecuentes
-CREATE INDEX IF NOT EXISTS "idx_usuarios_identificacion" ON "usuarios" ("numero_identificacion");
-CREATE INDEX IF NOT EXISTS "idx_problems_name" ON "problems" ("name");
-CREATE INDEX IF NOT EXISTS "idx_submissions_student" ON "submissions" ("student_id");
-CREATE INDEX IF NOT EXISTS "idx_submissions_problem" ON "submissions" ("problem_id");
+CREATE INDEX IF NOT EXISTS "idx_usuario_correo" ON "USUARIO" ("correo");
+CREATE INDEX IF NOT EXISTS "idx_archivo_profesor" ON "ARCHIVO" ("id_profesor");
+CREATE INDEX IF NOT EXISTS "idx_archivo_titulo" ON "ARCHIVO" ("titulo");
+CREATE INDEX IF NOT EXISTS "idx_descarga_estudiante" ON "DESCARGA" ("id_estudiante");
+CREATE INDEX IF NOT EXISTS "idx_descarga_archivo" ON "DESCARGA" ("id_archivo");
