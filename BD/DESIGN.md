@@ -1,110 +1,118 @@
-# Documento de Diseño: Base de Datos de Seguimiento Académico
+# Documento de Diseño: Base de Datos de Gestión de Usuarios y Descargas Académicas
 
 ---
 
-##  Alcance
+## 🎯 Alcance
 
-La base de datos para el proyecto incluye todas las entidades necesarias para facilitar el proceso de seguimiento del progreso de los estudiantes y dejar comentarios sobre el trabajo de los estudiantes. Como tal, se incluye en el alcance de la base de datos:
+La base de datos está diseñada para gestionar la administración de usuarios (administradores, profesores y estudiantes), la carga de recursos/archivos por parte de los profesores y el seguimiento de las descargas realizadas por los estudiantes.
 
-* **Estudiantes:** Incluye información básica de identificación.
-* **Instructores:** Incluye información básica de identificación.
-* **Entregas de estudiantes:** Incluye el momento en que se realizó la entrega, la puntuación de corrección que recibió y el problema al que está relacionada la entrega.
-* **Problemas:** Incluye información básica sobre los problemas del curso.
-* **Comentarios de los instructores:** Incluye el contenido del comentario y la entrega sobre la que se dejó el comentario.
+El alcance de la base de datos incluye:
 
->  **Fuera del alcance:** Quedan fuera del alcance elementos como certificados, calificaciones finales y otros atributos no esenciales.
+* **Administradores (`ADMIN`):** Gestión de credenciales, roles y creación de cuentas de usuario.
+* **Usuarios (`USUARIO`):** Entidad central para autenticación y control de acceso (asociada a administradores, profesores y estudiantes).
+* **Profesores (`PROFESOR`):** Información sobre el cuerpo docente y las materias que imparten.
+* **Estudiantes (`ESTUDIANTE`):** Información de identificación del alumno y su grado académico.
+* **Archivos (`ARCHIVO`):** Registro de los materiales y documentos subidos por los profesores.
+* **Descargas (`DESCARGA`):** Registro de las descargas realizadas por los estudiantes sobre los archivos disponibles.
+
+> 🚫 **Fuera del alcance:** Evaluaciones, calificaciones, entregas de tareas por parte de alumnos, foros de discusión o pagos de colegiatura.
 
 ---
 
-##  Requisitos Funcionales
+## ⚙️ Requisitos Funcionales
 
 Esta base de datos soportará:
 
-* Operaciones **CRUD** para estudiantes e instructores.
-* Seguimiento de todas las versiones de las entregas de los estudiantes, incluyendo múltiples entregas para el mismo problema.
-* Agregar múltiples comentarios a una entrega de un estudiante por parte de los instructores.
-
- *Tengan en cuenta que en esta iteración, el sistema no soportará que los estudiantes respondan a los comentarios.*
+* Operaciones **CRUD** para usuarios, administradores, profesores, estudiantes y archivos.
+* Autenticación centralizada mediante la tabla `USUARIO`.
+* Carga de archivos por parte de los profesores asociando título, descripción, URL y fecha.
+* Registro de auditoría o historial cada vez que un estudiante descarga un archivo (`DESCARGA`), guardando la fecha y hora exacta.
 
 ---
 
 ## 📊 Representación
 
-Las entidades se capturan en tablas de **SQLite** con el siguiente esquema.
+Las entidades se capturan en tablas de **SQL** (compatibles con SQLite / PostgreSQL / MySQL) con el siguiente esquema extraído del diagrama:
 
 ### Entidades
 
-#### 1. Estudiantes (`students`)
+#### 1. Administrador (`ADMIN`)
+Almacena la información de los administradores del sistema.
 
 | Columna | Tipo de Dato | Restricciones / Descripción |
 | :--- | :--- | :--- |
-| `id` | `INTEGER` | `PRIMARY KEY` — ID único para el estudiante. |
-| `first_name` | `TEXT` | Nombre del estudiante. |
-| `last_name` | `TEXT` | Apellido del estudiante. |
-| `github_username` | `TEXT` | `UNIQUE` — Nombre de usuario de GitHub (único por estudiante). |
-| `started` | `NUMERIC` | `DEFAULT CURRENT_TIMESTAMP` — Fecha y hora en que inició el curso. |
+| `id` | `INT` | `PRIMARY KEY` — Identificador único del administrador. |
+| `id_usuario` | `INT` | Identificador de relación con usuario. |
+| `correo` | `STRING` | Correo electrónico del administrador. |
+| `contraseña` | `STRING` | Contraseña de acceso. |
+| `rol` | `STRING` | Rol asignado. |
 
-#### 2. Instructores (`instructors`)
-
-| Columna | Tipo de Dato | Restricciones / Descripción |
-| :--- | :--- | :--- |
-| `id` | `INTEGER` | `PRIMARY KEY` — ID único para el instructor. |
-| `first_name` | `TEXT` | `NOT NULL` — Nombre del instructor. |
-| `last_name` | `TEXT` | `NOT NULL` — Apellido del instructor. |
-
-#### 3. Problemas (`problems`)
+#### 2. Usuario (`USUARIO`)
+Tabla central de autenticación y vinculación de perfiles.
 
 | Columna | Tipo de Dato | Restricciones / Descripción |
 | :--- | :--- | :--- |
-| `id` | `INTEGER` | `PRIMARY KEY` — ID único para el problema. |
-| `problem_set` | `INTEGER` | `NOT NULL` — Número del conjunto de problemas al que pertenece. |
-| `name` | `TEXT` | `NOT NULL` — Nombre del conjunto de problemas. |
+| `id` | `INT` | `PRIMARY KEY` — Identificador único del usuario. |
+| `id_estudiante` | `INT` | Identificador asociado si es estudiante. |
+| `id_profesor` | `INT` | Identificador asociado si es profesor. |
+| `id_admin` | `INT` | Identificador asociado si es administrador. |
+| `correo` | `STRING` | Correo electrónico para inicio de sesión. |
+| `contrasena` | `STRING` | Contraseña encriptada. |
+| `rol` | `STRING` | Rol del usuario (ej. Admin, Profesor, Estudiante). |
 
-#### 4. Entregas (`submissions`)
-
-| Columna | Tipo de Dato | Restricciones / Descripción |
-| :--- | :--- | :--- |
-| `id` | `INTEGER` | `PRIMARY KEY` — ID único para la entrega. |
-| `student_id` | `INTEGER` | `FOREIGN KEY(students.id)`, `NOT NULL` — Estudiante que entrega. |
-| `problem_id` | `INTEGER` | `FOREIGN KEY(problems.id)`, `NOT NULL` — Problema resuelto. |
-| `submission_path` | `TEXT` | `NOT NULL` — Ruta relativa de archivos en el servidor. |
-| `correctness` | `NUMERIC` | `NOT NULL`, `CHECK(correctness > 0 AND correctness <= 1.0)` — Puntuación (0 a 1.0). |
-| `timestamp` | `NUMERIC` | `NOT NULL`, `DEFAULT CURRENT_TIMESTAMP` — Fecha y hora de la entrega. |
-
-#### 5. Comentarios (`comments`)
+#### 3. Profesor (`PROFESOR`)
+Información específica del perfil docente.
 
 | Columna | Tipo de Dato | Restricciones / Descripción |
 | :--- | :--- | :--- |
-| `id` | `INTEGER` | `PRIMARY KEY` — ID único para el comentario. |
-| `instructor_id` | `INTEGER` | `FOREIGN KEY(instructors.id)`, `NOT NULL` — Autor del comentario. |
-| `submission_id` | `INTEGER` | `FOREIGN KEY(submissions.id)`, `NOT NULL` — Entrega comentada. |
-| `contents` | `TEXT` | `NOT NULL` — Texto y contenido del comentario. |
+| `id` | `INT` | `PRIMARY KEY` — Identificador único del profesor. |
+| `id_usuario` | `INT` | `FOREIGN KEY` — Referencia al usuario correspondiente. |
+| `nombre` | `STRING` | Nombre completo del profesor. |
+| `materia` | `STRING` | Materia o asignatura que imparte. |
+
+#### 4. Estudiante (`ESTUDIANTE`)
+Información específica del perfil del alumno.
+
+| Columna | Tipo de Dato | Restricciones / Descripción |
+| :--- | :--- | :--- |
+| `id` | `INT` | `PRIMARY KEY` — Identificador único del estudiante. |
+| `id_usuario` | `INT` | Referencia al usuario correspondiente. |
+| `nombre` | `STRING` | Nombre completo del estudiante. |
+| `grado` | `STRING` | Grado, curso o nivel académico del estudiante. |
+
+#### 5. Archivo (`ARCHIVO`)
+Documentos y recursos educativos subidos a la plataforma.
+
+| Columna | Tipo de Dato | Restricciones / Descripción |
+| :--- | :--- | :--- |
+| `id_archivo` | `INT` | `PRIMARY KEY` — Identificador único del archivo. |
+| `id_profesor` | `INT` | `FOREIGN KEY` — Profesor que subió el archivo. |
+| `titulo` | `STRING` | Título del recurso o documento. |
+| `descripcion` | `STRING` | Descripción detallada del contenido del archivo. |
+| `url_archivo` | `STRING` | Enlace / Ruta donde está almacenado el archivo. |
+| `fecha_subida` | `DATETIME` | Fecha y hora en la que se subió el archivo. |
+
+#### 6. Descarga (`DESCARGA`)
+Tabla asociativa/historial que registra las descargas efectuadas.
+
+| Columna | Tipo de Dato | Restricciones / Descripción |
+| :--- | :--- | :--- |
+| `id_descarga` | `INT` | `PRIMARY KEY` — Identificador único del evento de descarga. |
+| `id_estudiante` | `INT` | `FOREIGN KEY` — Estudiante que realiza la descarga. |
+| `id_archivo` | `INT` | `FOREIGN KEY` — Archivo descargado. |
+| `fecha_descarga` | `DATETIME` | Fecha y hora exacta en que se efectuó la descarga. |
 
 ---
 
 ### Relaciones
 
-El siguiente diagrama de entidad-relación describe las relaciones entre las entidades en la base de datos:
+A partir del diagrama Entidad-Relación proporcionado:
 
-![Diagrama Entidad-Relación]![alt text](image-2.png)
-
-Como se detalla en el diagrama:
-
-* **Estudiante ↔ Entrega (1:N):** Un estudiante es capaz de hacer de `0` a muchas entregas. Una entrega es realizada por uno y solo un estudiante *(entregas individuales)*.
-* **Problema ↔ Entrega (1:N):** Una entrega está asociada con uno y solo un problema. Un problema puede tener de `0` a muchas entregas.
-* **Entrega ↔ Comentario (1:N):** Un comentario está asociado con una y solo una entrega. Una entrega puede tener de `0` a muchos comentarios.
-* **Instructor ↔ Comentario (1:N):** Un comentario es escrito por uno y solo un instructor. Un instructor puede escribir de `0` a muchos comentarios.
+* **ADMIN ↔ USUARIO (1:1 / 1:N):** Un `ADMIN` crea / tiene asignado un registro en `USUARIO`.
+* **USUARIO ↔ PROFESOR (1:1):** Un `USUARIO` tiene asociado un único registro de `PROFESOR`.
+* **USUARIO ↔ ESTUDIANTE (1:1):** Un `USUARIO` tiene asociado un único registro de `ESTUDIANTE`.
+* **PROFESOR ↔ ARCHIVO (1:N):** Un `PROFESOR` sube de `0` a muchos `ARCHIVOS`. Cada `ARCHIVO` pertenece a un único `PROFESOR`.
+* **ESTUDIANTE ↔ DESCARGA (1:N):** Un `ESTUDIANTE` realiza de `0` a muchas `DESCARGAS`.
+* **ARCHIVO ↔ DESCARGA (1:N):** Un `ARCHIVO` es descargado en `0` o muchas `DESCARGAS`.
 
 ---
-
-##  Optimizaciones
-
-Según las consultas típicas en `queries.sql`:
-1. **Identificación de Estudiantes:** Se crean índices en las columnas `first_name`, `last_name` y `github_username` para acelerar las búsquedas de entregas por estudiante.
-2. **Búsqueda por Problema:** Se crea un índice en la columna `name` en la tabla `problems` para acelerar la identificación de problemas por nombre.
-
----
-
-##  Limitaciones
-
-El esquema actual asume **entregas individuales**. Las entregas colaborativas o en grupo requerirían modificar la estructura hacia una relación de muchos a muchos (M:N) entre estudiantes y entregas mediante una tabla intermedia.
