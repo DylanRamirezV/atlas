@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Profesor | Atlas{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/profesor.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="teacher-shell">
+    <header class="teacher-topbar">
+        <a class="brand-link" href="/profesor" aria-label="Volver al inicio de profesor">
+            <span class="brand-symbol" aria-hidden="true">A</span>
+            <span>Hola, {{ nombre_profesor }}</span>
+        </a>
+
+        <nav class="teacher-nav" aria-label="Apartados del profesor">
+            <button
+                class="nav-item is-active"
+                type="button"
+                hx-get="/profesor/panel/institucional?profesor_id={{ profesor_id }}"
+                hx-target="#teacher-window"
+                hx-swap="innerHTML"
+            >
+                Institucional
+            </button>
+            <button
+                class="nav-item"
+                type="button"
+                hx-get="/profesor/panel/materias?profesor_id={{ profesor_id }}"
+                hx-target="#teacher-window"
+                hx-swap="innerHTML"
+            >
+                Materias
+            </button>
+            <button
+                class="nav-item"
+                type="button"
+                hx-get="/profesor/panel/proyecto?profesor_id={{ profesor_id }}"
+                hx-target="#teacher-window"
+                hx-swap="innerHTML"
+            >
+                Sobre nuestro proyecto
+            </button>
+            <form action="/logout" method="post">
+                <button class="logout-button" type="submit">Cerrar sesion</button>
+            </form>
+        </nav>
+    </header>
+
+    <section class="teacher-stage" aria-label="Panel principal del profesor">
+        <div id="teacher-window" class="teacher-window">
+            {% include "partials/profesor_institucional.html" %}
+        </div>
+    </section>
+</main>
+{% endblock %}

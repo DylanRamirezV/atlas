@@ -1,0 +1,32 @@
+{% if archivo %}
+<div class="modal-backdrop">
+    <form
+        class="edit-modal"
+        hx-post="/archivos/{{ archivo.id }}/editar"
+        hx-target="#archivo-{{ archivo.id }}"
+        hx-swap="outerHTML"
+        hx-on::after-request="this.closest('.modal-backdrop').remove()"
+    >
+        <div class="modal-heading">
+            <p class="section-label">Editar archivo</p>
+            <button class="close-modal" type="button" onclick="this.closest('.modal-backdrop').remove()" aria-label="Cerrar">X</button>
+        </div>
+        <label class="edit-field" for="archivo-nombre-{{ archivo.id }}">
+            <span>Nombre</span>
+            <input id="archivo-nombre-{{ archivo.id }}" name="nombre" type="text" value="{{ archivo.nombre }}" required>
+        </label>
+        <label class="edit-field" for="archivo-descripcion-{{ archivo.id }}">
+            <span>Descripcion</span>
+            <textarea id="archivo-descripcion-{{ archivo.id }}" name="descripcion" rows="4">{{ archivo.descripcion }}</textarea>
+        </label>
+        <button class="solid-button" type="submit">Guardar cambios</button>
+    </form>
+</div>
+{% else %}
+<div class="modal-backdrop">
+    <div class="edit-modal">
+        <p>No se encontro el archivo que intentas editar.</p>
+        <button class="close-modal" type="button" onclick="this.closest('.modal-backdrop').remove()" aria-label="Cerrar">X</button>
+    </div>
+</div>
+{% endif %}

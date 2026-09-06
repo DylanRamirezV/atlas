@@ -1,0 +1,33 @@
+{% if archivo %}
+<div class="modal-backdrop">
+    <div class="edit-modal preview-modal">
+        <div class="modal-heading">
+            <p class="section-label">Previsualizacion</p>
+            <button class="close-modal" type="button" onclick="this.closest('.modal-backdrop').remove()" aria-label="Cerrar">X</button>
+        </div>
+        <h3>{{ archivo.nombre }}</h3>
+
+        {% if es_imagen %}
+        <img src="{{ archivo.url_archivo }}" alt="{{ archivo.nombre }}" style="max-width: 100%; border-radius: 8px;">
+        {% elif es_pdf %}
+        <iframe src="{{ archivo.url_archivo }}" title="{{ archivo.nombre }}" style="width: 100%; height: 70vh; border: 0; border-radius: 8px;"></iframe>
+        {% elif es_office %}
+        <iframe src="{{ url_visor_office }}" title="{{ archivo.nombre }}" style="width: 100%; height: 70vh; border: 0; border-radius: 8px;"></iframe>
+        {% else %}
+        <p>No hay previsualizacion disponible para este tipo de archivo.</p>
+        {% endif %}
+
+        <div class="row-actions" style="margin-top: 1rem;">
+            <a class="ghost-button" href="{{ archivo.url_archivo }}" target="_blank" rel="noopener">Abrir en pestana nueva</a>
+            <a class="solid-button" href="{{ archivo.url_archivo }}" download>Descargar</a>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="modal-backdrop">
+    <div class="edit-modal">
+        <p>No se encontro el archivo que intentas previsualizar.</p>
+        <button class="close-modal" type="button" onclick="this.closest('.modal-backdrop').remove()" aria-label="Cerrar">X</button>
+    </div>
+</div>
+{% endif %}

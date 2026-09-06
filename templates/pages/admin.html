@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Administrador | Atlas{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/profesor.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="teacher-shell">
+    <header class="teacher-topbar">
+        <a class="brand-link" href="/admin?admin_id={{ admin_id }}" aria-label="Volver al inicio de administrador">
+            <span class="brand-symbol" aria-hidden="true">A</span>
+            <span>Panel de administrador</span>
+        </a>
+
+        <nav class="teacher-nav" aria-label="Apartados del administrador">
+            <button
+                class="nav-item is-active"
+                type="button"
+                hx-get="/admin/panel/institucional?admin_id={{ admin_id }}"
+                hx-target="#admin-window"
+                hx-swap="innerHTML"
+            >
+                Institucional
+            </button>
+            <button
+                class="nav-item"
+                type="button"
+                hx-get="/admin/panel/usuarios?admin_id={{ admin_id }}"
+                hx-target="#admin-window"
+                hx-swap="innerHTML"
+            >
+                Crear usuarios
+            </button>
+            <button
+                class="nav-item"
+                type="button"
+                hx-get="/admin/panel/proyecto?admin_id={{ admin_id }}"
+                hx-target="#admin-window"
+                hx-swap="innerHTML"
+            >
+                Sobre nuestro proyecto
+            </button>
+            <form action="/logout" method="post">
+                <button class="logout-button" type="submit">Cerrar sesion</button>
+            </form>
+        </nav>
+    </header>
+
+    <section class="teacher-stage" aria-label="Panel principal del administrador">
+        <div id="admin-window" class="teacher-window">
+            {% include "partials/admin_institucional.html" %}
+        </div>
+    </section>
+</main>
+{% endblock %}

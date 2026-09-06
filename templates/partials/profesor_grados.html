@@ -1,0 +1,83 @@
+<div class="grades-heading">
+    <div>
+        <p class="section-label">Materia seleccionada</p>
+        <h2>{{ materia_activa.nombre if materia_activa else "Sin materia seleccionada" }}</h2>
+    </div>
+</div>
+
+<div class="grade-list">
+    {% for grado in grados %}
+    <button
+        class="grade-card grade-card--button {% if grado_activo_id == grado.id %}is-selected{% endif %}"
+        type="button"
+        hx-get="/profesor/materias/{{ materia_activa.id }}/grados/{{ grado.id }}?profesor_id={{ profesor_id }}"
+        hx-target="#grades-area"
+        hx-swap="innerHTML"
+    >
+        <div>
+            <p class="file-kicker">Grupo</p>
+            <h3>{{ grado.grupo }}</h3>
+            <p>Selecciona este grupo para subir o consultar archivos de la materia.</p>
+        </div>
+    </button>
+    {% else %}
+    <article class="grade-card grade-card--empty">
+        <h3>No hay grados conectados</h3>
+        <p>Cuando la materia tenga grados relacionados en la base de datos, apareceran en esta ventana.</p>
+    </article>
+    {% endfor %}
+</div>
+
+{% if error_subida %}
+<p class="form-error" role="alert">{{ error_subida }}</p>
+{% endif %}
+
+<div class="managed-files" aria-label="Archivos subidos" id="managed-files-area">
+    {% for archivo in archivos %}
+        {% include "partials/archivo_fila.html" %}
+    {% else %}
+    <article class="file-row file-row--empty">
+        <div>
+            <p class="file-kicker">Sin archivos</p>
+            <h3>Aun no hay archivos para este grado</h3>
+            <p>Usa el formulario de abajo para subir el primer archivo de esta materia y grado.</p>
+        </div>
+    </article>
+    {% endfor %}
+</div>
+
+<div id="edit-modal"></div>
+<div id="preview-modal"></div>
+
+{% if materia_activa and grado_activo_id %}
+<form
+    class="upload-area upload-form"
+    hx-post="/profesor/materias/{{ materia_activa.id }}/grados/{{ grado_activo_id }}/archivos"
+    hx-target="#grades-area"
+    hx-swap="innerHTML"
+    hx-encoding="multipart/form-data"
+>
+    <input type="hidden" name="profesor_id" value="{{ profesor_id }}">
+
+    <label class="edit-field" for="nuevo-archivo-nombre">
+        <span>Nombre</span>
+        <input id="nuevo-archivo-nombre" name="nombre" type="text" required>
+    </label>
+
+    <label class="edit-field" for="nuevo-archivo-descripcion">
+        <span>Descripcion</span>
+        <textarea id="nuevo-archivo-descripcion" name="descripcion" rows="2"></textarea>
+    </label>
+
+    <label class="edit-field" for="nuevo-archivo-file">
+        <span>Archivo</span>
+        <input id="nuevo-archivo-file" name="archivo" type="file" required>
+    </label>
+
+    <button class="upload-button" type="submit">Subir archivo</button>
+</form>
+{% else %}
+<div class="upload-area">
+    <button class="upload-button" type="button" disabled>Subir archivo</button>
+</div>
+{% endif %}

@@ -1,0 +1,56 @@
+<section class="content-panel" aria-labelledby="institucional-admin-title">
+    <div class="panel-header">
+        <div>
+            <p class="section-label">Comunicados oficiales</p>
+            <h1 id="institucional-admin-title">Institucional</h1>
+        </div>
+    </div>
+
+    {% if error_subida %}
+    <p class="form-error" role="alert">{{ error_subida }}</p>
+    {% endif %}
+
+    <div class="managed-files" aria-label="Comunicados institucionales" id="managed-files-area">
+        {% for archivo in archivos_institucionales %}
+            {% include "partials/archivo_fila.html" %}
+        {% else %}
+        <article class="file-row file-row--empty">
+            <div>
+                <p class="file-kicker">Sin comunicados</p>
+                <h3>Aun no hay archivos institucionales</h3>
+                <p>Usa el formulario de abajo para subir el primer comunicado.</p>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+
+    <div id="edit-modal"></div>
+    <div id="preview-modal"></div>
+
+    <form
+        class="upload-area upload-form"
+        hx-post="/admin/institucional/archivos"
+        hx-target="#admin-window"
+        hx-swap="innerHTML"
+        hx-encoding="multipart/form-data"
+    >
+        <input type="hidden" name="admin_id" value="{{ admin_id }}">
+
+        <label class="edit-field" for="nuevo-institucional-nombre">
+            <span>Nombre</span>
+            <input id="nuevo-institucional-nombre" name="nombre" type="text" required>
+        </label>
+
+        <label class="edit-field" for="nuevo-institucional-descripcion">
+            <span>Descripcion</span>
+            <textarea id="nuevo-institucional-descripcion" name="descripcion" rows="2"></textarea>
+        </label>
+
+        <label class="edit-field" for="nuevo-institucional-file">
+            <span>Archivo</span>
+            <input id="nuevo-institucional-file" name="archivo" type="file" required>
+        </label>
+
+        <button class="upload-button" type="submit">Subir comunicado</button>
+    </form>
+</section>

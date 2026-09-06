@@ -1,0 +1,35 @@
+{% if item and item.usuario %}
+<article class="file-row" id="usuario-fila-{{ item.usuario.id }}">
+    <div>
+        <p class="file-kicker">
+            {{ item.usuario.rol | capitalize }}
+            {% if item.grado %} · Grupo {{ item.grado.grupo }}{% endif %}
+        </p>
+        <h3>{{ item.nombre }}</h3>
+        <p>{{ item.usuario.correo }}</p>
+    </div>
+    <div class="icon-actions">
+        <button
+            class="icon-button icon-button--edit"
+            type="button"
+            hx-get="/admin/usuarios/{{ item.usuario.id }}/editar"
+            hx-target="#edit-user-modal"
+            hx-swap="innerHTML"
+            aria-label="Editar usuario"
+        >
+            Editar
+        </button>
+        <button
+            class="icon-button icon-button--delete"
+            type="button"
+            hx-delete="/admin/usuarios/{{ item.usuario.id }}"
+            hx-target="#usuario-fila-{{ item.usuario.id }}"
+            hx-swap="outerHTML"
+            hx-confirm="¿Seguro que quieres borrar este usuario? Esta accion no se puede deshacer."
+            aria-label="Borrar usuario"
+        >
+            X
+        </button>
+    </div>
+</article>
+{% endif %}

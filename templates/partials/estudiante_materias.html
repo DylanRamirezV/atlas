@@ -1,0 +1,39 @@
+<section class="content-panel" aria-labelledby="materias-estudiante-title">
+    <div class="panel-header">
+        <div>
+            <p class="section-label">
+                {% if grado %}Grupo {{ grado.grupo }}{% else %}Grupo sin asignar{% endif %}
+            </p>
+            <h1 id="materias-estudiante-title">Materias</h1>
+        </div>
+        <label class="search-box" for="buscar-materia-estudiante">
+            <span>Buscar</span>
+            <input id="buscar-materia-estudiante" type="search" name="q" placeholder="Buscar archivo">
+        </label>
+    </div>
+
+    <div class="split-layout">
+        <aside class="subject-panel" aria-label="Materias del estudiante">
+            <h2>Materias del grado</h2>
+            <div class="subject-list">
+                {% for materia in materias %}
+                <button
+                    class="subject-button {% if materia_activa and materia.id == materia_activa.id %}is-selected{% endif %}"
+                    type="button"
+                    hx-get="/estudiante/materias/{{ materia.id }}?estudiante_id={{ estudiante_id }}"
+                    hx-target="#student-files-area"
+                    hx-swap="innerHTML"
+                >
+                    {{ materia.nombre }}
+                </button>
+                {% else %}
+                <p class="empty-text">Aun no hay materias conectadas al grado del estudiante.</p>
+                {% endfor %}
+            </div>
+        </aside>
+
+        <div id="student-files-area" class="grades-panel">
+            {% include "partials/estudiante_materia_archivos.html" %}
+        </div>
+    </div>
+</section>

@@ -1,0 +1,46 @@
+<section class="content-panel" aria-labelledby="institucional-title">
+    <div class="panel-header">
+        <div>
+            <p class="section-label">Comunicados oficiales</p>
+            <h1 id="institucional-title">Institucional</h1>
+        </div>
+        <label class="search-box" for="buscar-institucional">
+            <span>Buscar</span>
+            <input id="buscar-institucional" type="search" name="q" placeholder="Buscar comunicado">
+        </label>
+    </div>
+
+    <div class="file-list">
+        {% for archivo in archivos_institucionales %}
+        <article class="file-row">
+            <div>
+                <p class="file-kicker">Subido el {{ archivo.fecha_subida.strftime('%Y-%m-%d') if archivo.fecha_subida else 'fecha desconocida' }}</p>
+                <h2>{{ archivo.nombre }}</h2>
+                <p>{{ archivo.descripcion }}</p>
+            </div>
+            <div class="row-actions" aria-label="Acciones del archivo">
+                <button
+                    class="ghost-button"
+                    type="button"
+                    hx-get="/archivos/{{ archivo.id }}/previsualizar"
+                    hx-target="#preview-modal"
+                    hx-swap="innerHTML"
+                >
+                    Previsualizar
+                </button>
+                <a class="solid-button" href="{{ archivo.url_archivo }}" download>Descargar</a>
+            </div>
+        </article>
+        {% else %}
+        <article class="file-row">
+            <div>
+                <p class="file-kicker">Pendiente</p>
+                <h2>Comunicados administrativos</h2>
+                <p>Los archivos subidos por administracion apareceran aqui.</p>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+
+    <div id="preview-modal"></div>
+</section>

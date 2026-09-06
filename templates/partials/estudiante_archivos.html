@@ -1,0 +1,40 @@
+<section class="content-panel" aria-labelledby="mis-archivos-title">
+    <div class="panel-header">
+        <div>
+            <p class="section-label">Descargas del estudiante</p>
+            <h1 id="mis-archivos-title">Mis archivos</h1>
+        </div>
+        <label class="search-box" for="buscar-mis-archivos">
+            <span>Buscar</span>
+            <input id="buscar-mis-archivos" type="search" name="q" placeholder="Buscar descarga">
+        </label>
+    </div>
+
+    <div class="file-list">
+        {% for descarga in descargas %}
+        <article class="file-row">
+            <div>
+                <p class="file-kicker">{{ descarga.fecha_descarga }} · {{ descarga.materia }}</p>
+                <h2>{{ descarga.nombre }}</h2>
+                <p>{{ descarga.descripcion }}</p>
+            </div>
+            <div class="row-actions" aria-label="Acciones del archivo descargado">
+                <button class="ghost-button" type="button">Previsualizar</button>
+                <button class="solid-button" type="button">Descargar</button>
+            </div>
+        </article>
+        {% else %}
+        <article class="file-row">
+            <div>
+                <p class="file-kicker">Fecha pendiente</p>
+                <h2>Historial de descargas</h2>
+                <p>Cuando se conecte el modelo de descargas, aqui veras fecha, nombre, descripcion y materia.</p>
+            </div>
+            <div class="row-actions" aria-label="Acciones del archivo descargado">
+                <button class="ghost-button" type="button">Previsualizar</button>
+                <button class="solid-button" type="button">Descargar</button>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>

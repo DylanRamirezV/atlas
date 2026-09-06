@@ -1,0 +1,37 @@
+<section class="content-panel" aria-labelledby="materias-title">
+    <div class="panel-header">
+        <div>
+            <p class="section-label">Gestion academica</p>
+            <h1 id="materias-title">Materias</h1>
+        </div>
+        <label class="search-box" for="buscar-materia">
+            <span>Buscar</span>
+            <input id="buscar-materia" type="search" name="q" placeholder="Buscar archivo">
+        </label>
+    </div>
+
+    <div class="split-layout">
+        <aside class="subject-panel" aria-label="Materias del profesor">
+            <h2>Materias asignadas</h2>
+            <div class="subject-list">
+                {% for materia in materias %}
+                <button
+                    class="subject-button {% if materia_activa and materia.id == materia_activa.id %}is-selected{% endif %}"
+                    type="button"
+                    hx-get="/profesor/materias/{{ materia.id }}/grados?profesor_id={{ profesor_id }}"
+                    hx-target="#grades-area"
+                    hx-swap="innerHTML"
+                >
+                    {{ materia.nombre }}
+                </button>
+                {% else %}
+                <p class="empty-text">Aun no hay materias asignadas en la base de datos.</p>
+                {% endfor %}
+            </div>
+        </aside>
+
+        <div id="grades-area" class="grades-panel">
+            {% include "partials/profesor_grados.html" %}
+        </div>
+    </div>
+</section>

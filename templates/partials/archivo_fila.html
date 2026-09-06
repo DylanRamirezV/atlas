@@ -1,0 +1,41 @@
+{% if archivo %}
+<article class="file-row" id="archivo-{{ archivo.id }}">
+    <div>
+        <p class="file-kicker">Subido el {{ archivo.fecha_subida.strftime('%Y-%m-%d') if archivo.fecha_subida else 'fecha desconocida' }}</p>
+        <h3>{{ archivo.nombre }}</h3>
+        <p>{{ archivo.descripcion }}</p>
+    </div>
+    <div class="icon-actions">
+        <button
+            class="ghost-button"
+            type="button"
+            hx-get="/archivos/{{ archivo.id }}/previsualizar"
+            hx-target="#preview-modal"
+            hx-swap="innerHTML"
+        >
+            Ver
+        </button>
+        <button
+            class="icon-button icon-button--edit"
+            type="button"
+            hx-get="/archivos/{{ archivo.id }}/editar"
+            hx-target="#edit-modal"
+            hx-swap="innerHTML"
+            aria-label="Editar archivo"
+        >
+            Editar
+        </button>
+        <button
+            class="icon-button icon-button--delete"
+            type="button"
+            hx-delete="/archivos/{{ archivo.id }}"
+            hx-target="#archivo-{{ archivo.id }}"
+            hx-swap="outerHTML"
+            hx-confirm="¿Seguro que quieres borrar este archivo? Esta accion no se puede deshacer."
+            aria-label="Borrar archivo"
+        >
+            X
+        </button>
+    </div>
+</article>
+{% endif %}

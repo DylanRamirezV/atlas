@@ -1,0 +1,52 @@
+{% if usuario %}
+<div class="modal-backdrop">
+    <form
+        class="edit-modal"
+        hx-post="/admin/usuarios/{{ usuario.id }}/editar"
+        hx-target="#usuario-fila-{{ usuario.id }}"
+        hx-swap="outerHTML"
+        hx-on::after-request="this.closest('.modal-backdrop').remove()"
+    >
+        <div class="modal-heading">
+            <p class="section-label">Editar {{ usuario.rol }}</p>
+            <button class="close-modal" type="button" onclick="this.closest('.modal-backdrop').remove()" aria-label="Cerrar">X</button>
+        </div>
+
+        <label class="edit-field" for="usuario-nombre-{{ usuario.id }}">
+            <span>Nombre</span>
+            <input id="usuario-nombre-{{ usuario.id }}" name="nombre" type="text" value="{{ nombre }}" required>
+        </label>
+
+        <label class="edit-field" for="usuario-correo-{{ usuario.id }}">
+            <span>Correo</span>
+            <input id="usuario-correo-{{ usuario.id }}" name="correo" type="email" value="{{ usuario.correo }}" required>
+        </label>
+
+        <label class="edit-field" for="usuario-contrasena-{{ usuario.id }}">
+            <span>Nueva contrasena (opcional)</span>
+            <input id="usuario-contrasena-{{ usuario.id }}" name="contrasena" type="text" placeholder="Dejar en blanco para no cambiarla">
+        </label>
+
+        {% if usuario.rol == "estudiante" %}
+        <label class="edit-field" for="usuario-grado-{{ usuario.id }}">
+            <span>Grado</span>
+            <select id="usuario-grado-{{ usuario.id }}" name="id_grado">
+                <option value="">Sin asignar</option>
+                {% for grado in grados %}
+                <option value="{{ grado.id }}" {% if id_grado_actual == grado.id %}selected{% endif %}>{{ grado.grupo }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        {% endif %}
+
+        <button class="solid-button" type="submit">Guardar cambios</button>
+    </form>
+</div>
+{% else %}
+<div class="modal-backdrop">
+    <div class="edit-modal">
+        <p>No se encontro el usuario que intentas editar.</p>
+        <button class="close-modal" type="button" onclick="this.closest('.modal-backdrop').remove()" aria-label="Cerrar">X</button>
+    </div>
+</div>
+{% endif %}

@@ -1,0 +1,73 @@
+<section class="content-panel" aria-labelledby="usuarios-title">
+    <div class="panel-header">
+        <div>
+            <p class="section-label">Gestion de cuentas</p>
+            <h1 id="usuarios-title">Crear usuarios</h1>
+        </div>
+    </div>
+
+    {% if error_usuario %}
+    <p class="form-error" role="alert">{{ error_usuario }}</p>
+    {% endif %}
+
+    <form
+        class="upload-area upload-form"
+        id="crear-usuario-form"
+        hx-post="/admin/usuarios"
+        hx-target="#admin-window"
+        hx-swap="innerHTML"
+    >
+        <input type="hidden" name="admin_id" value="{{ admin_id }}">
+
+        <label class="edit-field" for="nuevo-usuario-rol">
+            <span>Rol</span>
+            <select id="nuevo-usuario-rol" name="rol" onchange="document.getElementById('nuevo-usuario-grado-campo').style.display = this.value === 'estudiante' ? '' : 'none'">
+                <option value="estudiante">Estudiante</option>
+                <option value="profesor">Profesor</option>
+            </select>
+        </label>
+
+        <label class="edit-field" for="nuevo-usuario-nombre">
+            <span>Nombre</span>
+            <input id="nuevo-usuario-nombre" name="nombre" type="text" required>
+        </label>
+
+        <label class="edit-field" for="nuevo-usuario-correo">
+            <span>Correo</span>
+            <input id="nuevo-usuario-correo" name="correo" type="email" required>
+        </label>
+
+        <label class="edit-field" for="nuevo-usuario-contrasena">
+            <span>Contrasena</span>
+            <input id="nuevo-usuario-contrasena" name="contrasena" type="text" minlength="6" required>
+        </label>
+
+        <label class="edit-field" id="nuevo-usuario-grado-campo" for="nuevo-usuario-grado">
+            <span>Grado</span>
+            <select id="nuevo-usuario-grado" name="id_grado">
+                <option value="">Sin asignar</option>
+                {% for grado in grados %}
+                <option value="{{ grado.id }}">{{ grado.grupo }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <button class="upload-button" type="submit">Crear usuario</button>
+    </form>
+
+    <div class="managed-files" aria-label="Lista de usuarios" id="usuarios-area">
+        {% for item in usuarios %}
+            {% include "partials/admin_fila_usuario.html" %}
+        {% else %}
+        <article class="file-row file-row--empty">
+            <div>
+                <p class="file-kicker">Sin usuarios</p>
+                <h3>Aun no hay estudiantes ni profesores registrados</h3>
+                <p>Usa el formulario de arriba para crear el primero.</p>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+
+    <div id="edit-user-modal"></div>
+</section>

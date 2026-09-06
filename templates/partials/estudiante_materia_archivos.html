@@ -1,0 +1,44 @@
+<div class="grades-heading">
+    <div>
+        <p class="section-label">Materia seleccionada</p>
+        <h2>{{ materia_activa.nombre if materia_activa else "Sin materia seleccionada" }}</h2>
+    </div>
+</div>
+
+<div class="managed-files" aria-label="Archivos disponibles de la materia">
+    {% for archivo in archivos_materia %}
+    <article class="file-row">
+        <div>
+            <p class="file-kicker">Subido el {{ archivo.fecha_subida.strftime('%Y-%m-%d') if archivo.fecha_subida else 'fecha desconocida' }}</p>
+            <h3>{{ archivo.nombre }}</h3>
+            <p>{{ archivo.descripcion }}</p>
+        </div>
+        <div class="row-actions" aria-label="Acciones del archivo">
+            <button
+                class="ghost-button"
+                type="button"
+                hx-get="/archivos/{{ archivo.id }}/previsualizar"
+                hx-target="#preview-modal"
+                hx-swap="innerHTML"
+            >
+                Previsualizar
+            </button>
+            <a class="solid-button" href="{{ archivo.url_archivo }}" download>Descargar</a>
+        </div>
+    </article>
+    {% else %}
+    <article class="file-row">
+        <div>
+            <p class="file-kicker">Disponible proximamente</p>
+            <h3>Archivos de la materia</h3>
+            <p>Los documentos que suba el profesor para esta materia y grado apareceran aqui.</p>
+        </div>
+        <div class="row-actions" aria-label="Acciones del archivo">
+            <button class="ghost-button" type="button" disabled>Previsualizar</button>
+            <button class="solid-button" type="button" disabled>Descargar</button>
+        </div>
+    </article>
+    {% endfor %}
+</div>
+
+<div id="preview-modal"></div>

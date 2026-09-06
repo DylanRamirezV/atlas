@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Estudiante | Atlas{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/profesor.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="teacher-shell">
+    <header class="teacher-topbar">
+        <a class="brand-link" href="/estudiante?estudiante_id={{ estudiante_id }}" aria-label="Volver al inicio de estudiante">
+            <span class="brand-symbol" aria-hidden="true">A</span>
+            <span>Hola, {{ nombre_estudiante }}</span>
+        </a>
+
+        <nav class="teacher-nav" aria-label="Apartados del estudiante">
+            <button
+                class="nav-item is-active"
+                type="button"
+                hx-get="/estudiante/panel/institucional?estudiante_id={{ estudiante_id }}"
+                hx-target="#student-window"
+                hx-swap="innerHTML"
+            >
+                Institucional
+            </button>
+            <button
+                class="nav-item"
+                type="button"
+                hx-get="/estudiante/panel/materias?estudiante_id={{ estudiante_id }}"
+                hx-target="#student-window"
+                hx-swap="innerHTML"
+            >
+                Materias
+            </button>
+            <button
+                class="nav-item"
+                type="button"
+                hx-get="/estudiante/panel/archivos?estudiante_id={{ estudiante_id }}"
+                hx-target="#student-window"
+                hx-swap="innerHTML"
+            >
+                Mis archivos
+            </button>
+            <button
+                class="nav-item"
+                type="button"
+                hx-get="/estudiante/panel/proyecto?estudiante_id={{ estudiante_id }}"
+                hx-target="#student-window"
+                hx-swap="innerHTML"
+            >
+                Sobre nuestro proyecto
+            </button>
+            <form action="/logout" method="post">
+                <button class="logout-button" type="submit">Cerrar sesion</button>
+            </form>
+        </nav>
+    </header>
+
+    <section class="teacher-stage" aria-label="Panel principal del estudiante">
+        <div id="student-window" class="teacher-window">
+            {% include "partials/estudiante_institucional.html" %}
+        </div>
+    </section>
+</main>
+{% endblock %}
