@@ -2,37 +2,40 @@
 
 ---
 
-## 🎯 Alcance
+##  Alcance
 
-La base de datos está diseñada para gestionar la administración de usuarios (administradores, profesores y estudiantes), la carga de recursos/archivos por parte de los profesores y administradores, y el seguimiento de las descargas realizadas por estudiantes y profesores.
+La base de datos está diseñada para gestionar la administración de usuarios, la estructura académica (grados y materias), la vinculación de profesores y estudiantes con sus respectivas asignaturas, la carga de recursos/archivos por parte de los profesores y el seguimiento de las descargas realizadas por los estudiantes.
 
-El alcance de la base de datos incluye:
+El alcance de la base de datos incluye las siguientes entidades:
 
-* **Administradores (`ADMIN`):** Gestión de credenciales, roles, creación de cuentas de usuario y subida directa de archivos.
+* **Administradores (`ADMIN`):** Gestión de credenciales y creación/administración de usuarios.
 * **Usuarios (`USUARIO`):** Entidad central para autenticación y control de acceso (asociada a administradores, profesores y estudiantes).
-* **Profesores (`PROFESOR`):** Información sobre el cuerpo docente y las materias que imparten.
-* **Estudiantes (`ESTUDIANTE`):** Información de identificación del alumno y su grado académico.
-* **Archivos (`ARCHIVO`):** Registro de los materiales y documentos subidos tanto por profesores como por administradores.
-* **Descargas (`DESCARGA`):** Registro de las descargas realizadas por los estudiantes y profesores sobre los archivos disponibles.
-
-> 🚫 **Fuera del alcance:** Evaluaciones, calificaciones, entregas de tareas por parte de alumnos, foros de discusión o pagos de colegiatura.
+* **Profesores (`PROFESOR`):** Información sobre el cuerpo docente.
+* **Estudiantes (`ESTUDIANTE`):** Información de identificación del alumno y su grado académico asociado.
+* **Grados (`GRADOS`):** Catálogo de grados o niveles académicos.
+* **Materias (`MATERIAS`):** Catálogo de asignaturas disponibles en la institución.
+* **Asignaciones de Profesor (`PROFESOR_MATERIA`):** Relación entre profesores y las materias que imparten (dictan).
+* **Asignaciones de Estudiante (`ESTUDIANTE_MATERIA`):** Relación entre estudiantes y las materias que cursan.
+* **Archivos (`ARCHIVO`):** Registro de materiales y documentos subidos por los profesores, asociados a una materia específica.
+* **Descargas (`DESCARGA`):** Registro de las descargas realizadas por los estudiantes sobre los archivos disponibles.
 
 ---
 
-## ⚙️ Requisitos Funcionales
+##  Requisitos Funcionales
 
 Esta base de datos soportará:
 
-* Operaciones **CRUD** para usuarios, administradores, profesores, estudiantes y archivos.
+* Operaciones **CRUD** para usuarios, administradores, profesores, estudiantes, grados, materias y archivos.
 * Autenticación centralizada mediante la tabla `USUARIO`.
-* Carga de archivos por parte de los profesores y de los administradores asociando título, descripción, URL y fecha.
-* Registro de auditoría o historial cada vez que un estudiante o un profesor realiza una descarga sobre un archivo (`DESCARGA`), guardando la fecha y hora exacta.
+* Gestión de la estructura académica asignando materias a profesores y cursos/materias a estudiantes.
+* Carga de archivos por parte de los profesores asociándolos a una materia en específico, junto con título, descripción, URL y fecha.
+* Registro de auditoría o historial cada vez que un estudiante realiza una descarga sobre un archivo (`DESCARGA`), guardando la fecha y hora exacta.
 
 ---
 
-## 📊 Representación
+##  Representación
 
-Las entidades se capturan en tablas de **SQL** (compatibles con SQLite / PostgreSQL / MySQL) con el siguiente esquema extraído directamente del diagrama ER:
+Las entidades se capturan en tablas **SQL** con el siguiente esquema extraído directamente del diagrama ER:
 
 ### Entidades
 
@@ -41,87 +44,127 @@ Almacena la información de los administradores del sistema.
 
 | Columna | Tipo de Dato | Restricciones / Descripción |
 | :--- | :--- | :--- |
-| `id` | `INT` | `PRIMARY KEY` — Identificador único del administrador. |
-| `id_usuario` | `INT` | Identificador de relación con usuario. |
-| `correo` | `STRING` | Correo electrónico del administrador. |
-| `contraseña` | `STRING` | Contraseña de acceso. |
-| `rol` | `STRING` | Rol asignado. |
+| `id` | `int` | `PRIMARY KEY` — Identificador único del administrador. |
+| `id_usuario` | `int` | `FOREIGN KEY` — Referencia al usuario correspondiente. |
+| `correo` | `string` | Correo electrónico del administrador. |
+| `contraseña` | `string` | Contraseña de acceso. |
+| `rol` | `string` | Rol asignado. |
 
 #### 2. Usuario (`USUARIO`)
 Tabla central de autenticación y vinculación de perfiles.
 
 | Columna | Tipo de Dato | Restricciones / Descripción |
 | :--- | :--- | :--- |
-| `id` | `INT` | `PRIMARY KEY` — Identificador único del usuario. |
-| `id_estudiante` | `INT` | Identificador asociado si es estudiante. |
-| `id_profesor` | `INT` | Identificador asociado si es profesor. |
-| `id_admin` | `INT` | Identificador asociado si es administrador. |
-| `correo` | `STRING` | Correo electrónico para inicio de sesión. |
-| `contrasena` | `STRING` | Contraseña encriptada. |
-| `rol` | `STRING` | Rol del usuario (ej. Admin, Profesor, Estudiante). |
+| `id` | `int` | `PRIMARY KEY` — Identificador único del usuario. |
+| `id_estudiante` | `int` | `FOREIGN KEY` — Identificador asociado si es estudiante. |
+| `id_profesor` | `int` | `FOREIGN KEY` — Identificador asociado si es profesor. |
+| `id_admin` | `int` | `FOREIGN KEY` — Identificador asociado si es administrador. |
+| `correo` | `string` | Correo electrónico para inicio de sesión. |
+| `contrasena` | `string` | Contraseña encriptada. |
+| `rol` | `string` | Rol del usuario. |
 
 #### 3. Profesor (`PROFESOR`)
 Información específica del perfil docente.
 
 | Columna | Tipo de Dato | Restricciones / Descripción |
 | :--- | :--- | :--- |
-| `id` | `INT` | `PRIMARY KEY` — Identificador único del profesor. |
-| `id_usuario` | `INT` | `FOREIGN KEY` — Referencia al usuario correspondiente. |
-| `nombre` | `STRING` | Nombre completo del profesor. |
-| `materia` | `STRING` | Materia o asignatura que imparte. |
+| `id` | `int` | `PRIMARY KEY` — Identificador único del profesor. |
+| `id_usuario` | `int` | `FOREIGN KEY` — Referencia al usuario correspondiente. |
+| `nombre` | `string` | Nombre completo del profesor. |
 
-#### 4. Estudiante (`ESTUDIANTE`)
+#### 4. Grados (`GRADOS`)
+Catálogo de grados o niveles académicos.
+
+| Columna | Tipo de Dato | Restricciones / Descripción |
+| :--- | :--- | :--- |
+| `id` | `int` | `PRIMARY KEY` — Identificador único del grado. |
+| `nombre` | `string` | Nombre del grado académico. |
+
+#### 5. Estudiante (`ESTUDIANTE`)
 Información específica del perfil del alumno.
 
 | Columna | Tipo de Dato | Restricciones / Descripción |
 | :--- | :--- | :--- |
-| `id` | `INT` | `PRIMARY KEY` — Identificador único del estudiante. |
-| `id_usuario` | `INT` | Referencia al usuario correspondiente. |
-| `nombre` | `STRING` | Nombre completo del estudiante. |
-| `grado` | `STRING` | Grado, curso o nivel académico del estudiante. |
+| `id` | `int` | `PRIMARY KEY` — Identificador único del estudiante. |
+| `id_usuario` | `int` | `FOREIGN KEY` — Referencia al usuario correspondiente. |
+| `id_grado` | `int` | `FOREIGN KEY` — Referencia al grado al que pertenece. |
+| `nombre` | `string` | Nombre completo del estudiante. |
 
-#### 5. Archivo (`ARCHIVO`)
-Documentos y recursos educativos subidos a la plataforma.
-
-| Columna | Tipo de Dato | Restricciones / Descripción |
-| :--- | :--- | :--- |
-| `id_archivo` | `INT` | `PRIMARY KEY` — Identificador único del archivo. |
-| `id_profesor` | `INT` | `FOREIGN KEY` — Profesor que subió el archivo. |
-| `titulo` | `STRING` | Título del recurso o documento. |
-| `descripcion` | `STRING` | Descripción detallada del contenido del archivo. |
-| `url_archivo` | `STRING` | Enlace / Ruta donde está almacenado el archivo. |
-| `fecha_subida` | `DATETIME` | Fecha y hora en la que se subió el archivo. |
-
-#### 6. Descarga (`DESCARGA`)
-Tabla asociativa/historial que registra las descargas efectuadas.
+#### 6. Materias (`MATERIAS`)
+Catálogo de asignaturas o materias educativas.
 
 | Columna | Tipo de Dato | Restricciones / Descripción |
 | :--- | :--- | :--- |
-| `id_descarga` | `INT` | `PRIMARY KEY` — Identificador único del evento de descarga. |
-| `id_estudiante` | `INT` | `FOREIGN KEY` — Estudiante que realiza la descarga. |
-| `id_archivo` | `INT` | `FOREIGN KEY` — Archivo descargado. |
-| `fecha_descarga` | `DATETIME` | Fecha y hora exacta en que se efectuó la descarga. |
+| `id` | `int` | `PRIMARY KEY` — Identificador único de la materia. |
+| `nombre` | `string` | Nombre de la materia. |
+
+#### 7. Profesor - Materia (`PROFESOR_MATERIA`)
+Tabla de unión que asigna las materias impartidas por cada profesor.
+
+| Columna | Tipo de Dato | Restricciones / Descripción |
+| :--- | :--- | :--- |
+| `id` | `int` | `PRIMARY KEY` — Identificador único del registro. |
+| `id_profesor` | `int` | `FOREIGN KEY` — Referencia al profesor. |
+| `id_materia` | `int` | `FOREIGN KEY` — Referencia a la materia. |
+
+#### 8. Estudiante - Materia (`ESTUDIANTE_MATERIA`)
+Tabla de unión que registra las materias cursadas por cada estudiante.
+
+| Columna | Tipo de Dato | Restricciones / Descripción |
+| :--- | :--- | :--- |
+| `id` | `int` | `PRIMARY KEY` — Identificador único del registro. |
+| `id_estudiante` | `int` | `FOREIGN KEY` — Referencia al estudiante. |
+| `id_materia` | `int` | `FOREIGN KEY` — Referencia a la materia. |
+
+#### 9. Archivo (`ARCHIVO`)
+Documentos y recursos educativos subidos por los profesores para sus materias.
+
+| Columna | Tipo de Dato | Restricciones / Descripción |
+| :--- | :--- | :--- |
+| `id_archivo` | `int` | `PRIMARY KEY` — Identificador único del archivo. |
+| `id_profesor` | `int` | `FOREIGN KEY` — Profesor que subió el archivo. |
+| `id_materia` | `int` | `FOREIGN KEY` — Materia a la que pertenece el archivo. |
+| `titulo` | `string` | Título del recurso o documento. |
+| `descripcion` | `string` | Descripción del contenido del archivo. |
+| `url_archivo` | `string` | Enlace / Ruta de almacenamiento del archivo. |
+| `fecha_subida` | `datetime` | Fecha y hora en la que se subió el archivo. |
+
+#### 10. Descarga (`DESCARGA`)
+Tabla asociativa/historial que registra las descargas efectuadas por los estudiantes.
+
+| Columna | Tipo de Dato | Restricciones / Descripción |
+| :--- | :--- | :--- |
+| `id_descarga` | `int` | `PRIMARY KEY` — Identificador único del evento de descarga. |
+| `id_estudiante` | `int` | `FOREIGN KEY` — Estudiante que realiza la descarga. |
+| `id_archivo` | `int` | `FOREIGN KEY` — Archivo descargado. |
+| `fecha_descarga` | `datetime` | Fecha y hora exacta en que se efectuó la descarga. |
 
 ---
 
 ### Relaciones Exactas del Diagrama
 
-A partir de la notación de pata de gallo (Crow's Foot) del diagrama ER proporcionado:
+A partir de la notación de pata de gallo (Crow's Foot) del diagrama ER:
 
 * **ADMIN ↔ USUARIO:**
-  * **Crea:** Un `ADMIN` crea de `0` a muchos (`1:N`) registros en `USUARIO`.
-  * **Tiene:** Un `ADMIN` se vincula con exactamente un (`1:1`) registro de `USUARIO`.
+  * **crea:** Un `ADMIN` crea de `0` a muchos (`0:N`) registros en `USUARIO`.
+  * **tiene:** Un `ADMIN` se vincula de forma exacta (`1:1`) con `USUARIO`.
 * **USUARIO ↔ PROFESOR:**
-  * **Tiene:** Un `USUARIO` tiene exactamente un (`1:1`) perfil de `PROFESOR`.
+  * **tiene:** Un `USUARIO` se vincula (`1:1`) con un perfil de `PROFESOR`.
 * **USUARIO ↔ ESTUDIANTE:**
-  * **Tiene:** Un `USUARIO` tiene exactamente un (`1:1`) perfil de `ESTUDIANTE`.
-* **ADMIN ↔ ARCHIVO:**
-  * **Sube:** Un `ADMIN` puede subir de `1` a muchos (`1:N`) archivos en `ARCHIVO`.
+  * **pertenece_a / tiene:** Un `USUARIO` se vincula (`1:1`) con un perfil de `ESTUDIANTE`.
+* **GRADOS ↔ ESTUDIANTE:**
+  * **pertenece_a:** Un `GRADOS` puede tener de `1` a muchos (`1:N`) registros en `ESTUDIANTE`. Un `ESTUDIANTE` pertenece a exactamente un (`1:1`) `GRADOS`.
+* **PROFESOR ↔ PROFESOR_MATERIA:**
+  * **dicta:** Un `PROFESOR` se relaciona con `1` a muchas (`1:N`) asignaciones en `PROFESOR_MATERIA`.
+* **MATERIAS ↔ PROFESOR_MATERIA:**
+  * **es_impartida_en:** Una `MATERIAS` se vincula con `1` a muchas (`1:N`) asignaciones en `PROFESOR_MATERIA`.
+* **ESTUDIANTE ↔ ESTUDIANTE_MATERIA:**
+  * **cursa:** Un `ESTUDIANTE` se relaciona con `1` a muchas (`1:N`) asignaciones en `ESTUDIANTE_MATERIA`.
+* **MATERIAS ↔ ESTUDIANTE_MATERIA:**
+  * **pertenece_a:** Una `MATERIAS` se vincula con `1` a muchas (`1:N`) asignaciones en `ESTUDIANTE_MATERIA`.
 * **PROFESOR ↔ ARCHIVO:**
-  * **Sube:** Un `PROFESOR` puede subir de `1` a muchos (`1:N`) archivos en `ARCHIVO`.
-* **PROFESOR ↔ DESCARGA:**
-  * **Realiza:** Un `PROFESOR` puede realizar de `1` a muchas (`1:N`) descargas registradas en `DESCARGA`.
+  * **sube:** Un `PROFESOR` puede subir de `1` a muchos (`1:N`) recursos en `ARCHIVO`.
 * **ESTUDIANTE ↔ DESCARGA:**
-  * **Realiza:** Un `ESTUDIANTE` realiza de `1` a muchas (`1:N`) descargas registradas en `DESCARGA`.
+  * **realiza:** Un `ESTUDIANTE` realiza de `1` a muchas (`1:N`) descargas registradas en `DESCARGA`.
 * **ARCHIVO ↔ DESCARGA:**
-  * **Es descargado:** Un `ARCHIVO` puede estar presente en de `1` a muchas (`1:N`) instancias de `DESCARGA`.
+  * **es_descargado:** Un `ARCHIVO` puede ser descargado en de `1` a muchas (`1:N`) instancias registradas en `DESCARGA`.
