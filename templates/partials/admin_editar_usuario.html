@@ -37,6 +37,17 @@
                 {% endfor %}
             </select>
         </label>
+        {% elif usuario.rol == "profesor" %}
+        <label class="edit-field" for="usuario-materias-{{ usuario.id }}">
+            <span>Materias que dicta</span>
+            <select id="usuario-materias-{{ usuario.id }}" name="materias" multiple size="5">
+                {% for materia in materias %}
+                <option value="{{ materia.id }}" {% if materia.id in ids_materias_actuales %}selected{% endif %}>{{ materia.nombre }}</option>
+                {% else %}
+                <option value="" disabled>No hay materias creadas todavia</option>
+                {% endfor %}
+            </select>
+        </label>
         {% endif %}
 
         <button class="solid-button" type="submit">Guardar cambios</button>

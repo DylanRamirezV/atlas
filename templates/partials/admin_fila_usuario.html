@@ -7,6 +7,15 @@
         </p>
         <h3>{{ item.nombre }}</h3>
         <p>{{ item.usuario.correo }}</p>
+        {% if item.usuario.rol == "profesor" %}
+        <p class="file-kicker">
+            {% if item.materias %}
+                Dicta: {{ item.materias | map(attribute="nombre") | join(", ") }}
+            {% else %}
+                Sin materias asignadas
+            {% endif %}
+        </p>
+        {% endif %}
     </div>
     <div class="icon-actions">
         <button

@@ -21,7 +21,10 @@
 
         <label class="edit-field" for="nuevo-usuario-rol">
             <span>Rol</span>
-            <select id="nuevo-usuario-rol" name="rol" onchange="document.getElementById('nuevo-usuario-grado-campo').style.display = this.value === 'estudiante' ? '' : 'none'">
+            <select id="nuevo-usuario-rol" name="rol" onchange="
+                document.getElementById('nuevo-usuario-grado-campo').style.display = this.value === 'estudiante' ? '' : 'none';
+                document.getElementById('nuevo-usuario-materias-campo').style.display = this.value === 'profesor' ? '' : 'none';
+            ">
                 <option value="estudiante">Estudiante</option>
                 <option value="profesor">Profesor</option>
             </select>
@@ -48,6 +51,17 @@
                 <option value="">Sin asignar</option>
                 {% for grado in grados %}
                 <option value="{{ grado.id }}">{{ grado.grupo }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label class="edit-field" id="nuevo-usuario-materias-campo" for="nuevo-usuario-materias" style="display: none;">
+            <span>Materias que dicta</span>
+            <select id="nuevo-usuario-materias" name="materias" multiple size="5">
+                {% for materia in materias %}
+                <option value="{{ materia.id }}">{{ materia.nombre }}</option>
+                {% else %}
+                <option value="" disabled>No hay materias creadas todavia</option>
                 {% endfor %}
             </select>
         </label>

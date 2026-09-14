@@ -108,6 +108,10 @@ def obtener_todos_los_grados(db: Session) -> list[Grado]:
     return db.query(Grado).order_by(Grado.grupo.asc()).all()
 
 
+def obtener_todas_las_materias(db: Session) -> list[Materia]:
+    return db.query(Materia).order_by(Materia.nombre.asc()).all()
+
+
 def obtener_contexto_profesor(db: Session, profesor_id: int) -> dict:
     profesor = db.query(Profesor).filter(Profesor.id == profesor_id).first()
 
@@ -492,12 +496,24 @@ async def previsualizar_archivo(
 # de la URL, siempre se calcula desde la sesion via requerir_admin)
 # ---------------------------------------------------------------------------
 
+def obtener_ids_materias_profesor(db: Session, profesor_id: int) -> list[int]:
+    filas = db.query(ProfesorMateria.id_materia).filter(ProfesorMateria.id_profesor == profesor_id).all()
+    return [fila.id_materia for fila in filas]
+
+
+def sincronizar_materias_profesor(db: Session, profesor_id: int, ids_materias: list[int]) -> None:
+    db.query(ProfesorMateria).filter(ProfesorMateria.id_profesor == profesor_id).delete()
+    for id_materia in set(ids_materias):
+        db.add(ProfesorMateria(id_profesor=profesor_id, id_materia=id_materia))
+
+
 def obtener_contexto_admin(db: Session, admin_id: int) -> dict:
     return {
         "admin_id": admin_id,
         "archivos_institucionales": obtener_archivos_institucionales(db),
         "usuarios": obtener_usuarios_gestionables(db),
         "grados": obtener_todos_los_grados(db),
+        "materias": obtener_todas_las_materias(db),
     }
 
 
@@ -513,6 +529,7 @@ def obtener_usuarios_gestionables(db: Session) -> list[dict]:
     for usuario in usuarios:
         nombre = None
         grado = None
+        materias = []
 
         if usuario.rol == "estudiante":
             perfil = db.query(Estudiante).filter(Estudiante.id_usuario == usuario.id).first()
@@ -523,11 +540,13 @@ def obtener_usuarios_gestionables(db: Session) -> list[dict]:
             perfil = db.query(Profesor).filter(Profesor.id_usuario == usuario.id).first()
             if perfil:
                 nombre = perfil.nombre
+                materias = obtener_materias_profesor(db, perfil)
 
         resultado.append({
             "usuario": usuario,
             "nombre": nombre or "(sin nombre)",
             "grado": grado,
+            "materias": materias,
         })
 
     return resultado
@@ -629,6 +648,7 @@ async def crear_usuario(
     correo: str = Form(...),
     contrasena: str = Form(...),
     id_grado: int | None = Form(None),
+    materias: list[int] = Form(default=[]),
     admin_id: int = Depends(requerir_admin),
     db: Session = Depends(get_db),
 ):
@@ -666,6 +686,7 @@ async def crear_usuario(
             db.add(perfil)
             db.flush()
             nuevo_usuario.id_profesor = perfil.id
+            sincronizar_materias_profesor(db, perfil.id, materias)
 
         db.commit()
 
@@ -676,6 +697,7 @@ async def crear_usuario(
             "admin_id": admin_id,
             "usuarios": obtener_usuarios_gestionables(db),
             "grados": obtener_todos_los_grados(db),
+            "materias": obtener_todas_las_materias(db),
             "error_usuario": error,
         },
     )
@@ -691,6 +713,7 @@ async def obtener_edicion_usuario(
     usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
     nombre = ""
     id_grado_actual = None
+    ids_materias_actuales: list[int] = []
 
     if usuario is not None:
         if usuario.rol == "estudiante":
@@ -702,6 +725,7 @@ async def obtener_edicion_usuario(
             perfil = db.query(Profesor).filter(Profesor.id_usuario == usuario.id).first()
             if perfil:
                 nombre = perfil.nombre
+                ids_materias_actuales = obtener_ids_materias_profesor(db, perfil.id)
 
     return templates.TemplateResponse(
         request,
@@ -711,6 +735,8 @@ async def obtener_edicion_usuario(
             "nombre": nombre,
             "id_grado_actual": id_grado_actual,
             "grados": obtener_todos_los_grados(db),
+            "materias": obtener_todas_las_materias(db),
+            "ids_materias_actuales": ids_materias_actuales,
         },
     )
 
@@ -723,6 +749,7 @@ async def guardar_edicion_usuario(
     correo: str = Form(...),
     contrasena: str = Form(""),
     id_grado: int | None = Form(None),
+    materias: list[int] = Form(default=[]),
     db: Session = Depends(get_db),
     _admin_id: int = Depends(requerir_admin),
 ):
@@ -750,6 +777,7 @@ async def guardar_edicion_usuario(
             perfil = db.query(Profesor).filter(Profesor.id_usuario == usuario.id).first()
             if perfil:
                 perfil.nombre = nombre.strip() or perfil.nombre
+                sincronizar_materias_profesor(db, perfil.id, materias)
 
         db.commit()
 
@@ -763,6 +791,16 @@ async def guardar_edicion_usuario(
                 db.query(Grado).filter(Grado.id == id_grado).first()
                 if usuario and usuario.rol == "estudiante" and id_grado
                 else None
+            ),
+            "materias": (
+                db.query(Materia)
+                .join(ProfesorMateria, Materia.id == ProfesorMateria.id_materia)
+                .join(Profesor, Profesor.id == ProfesorMateria.id_profesor)
+                .filter(Profesor.id_usuario == usuario.id)
+                .order_by(Materia.nombre.asc())
+                .all()
+                if usuario and usuario.rol == "profesor"
+                else []
             ),
         }},
     )
