@@ -223,6 +223,25 @@ button {
     gap: 14px;
 }
 
+.user-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.user-filters .edit-field {
+    min-width: min(220px, 100%);
+}
+
+.user-filters select {
+    min-height: 46px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 0 12px;
+    color: var(--ink);
+    background: var(--field);
+}
+
 .file-row {
     display: flex;
     align-items: center;
@@ -232,6 +251,10 @@ button {
     border-radius: 18px;
     padding: 18px;
     background: var(--field);
+}
+
+#usuarios-area .file-row[hidden] {
+    display: none;
 }
 
 .file-row h2,

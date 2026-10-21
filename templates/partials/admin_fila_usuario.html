@@ -1,5 +1,10 @@
 {% if item and item.usuario %}
-<article class="file-row" id="usuario-fila-{{ item.usuario.id }}">
+<article
+    class="file-row"
+    id="usuario-fila-{{ item.usuario.id }}"
+    data-user-role="{{ item.usuario.rol }}"
+    data-user-group="{{ item.grado.id if item.grado else '' }}"
+>
     <div>
         <p class="file-kicker">
             {{ item.usuario.rol | capitalize }}

@@ -4,7 +4,7 @@
 
 ## 🎯 Alcance
 
-La base de datos está diseñada para gestionar la administración de usuarios, la estructura académica (grados y materias), la vinculación de profesores y estudiantes con sus respectivas asignaturas, la carga de recursos/archivos por parte de los profesores y el seguimiento de las descargas realizadas por los estudiantes.
+La base de datos está diseñada para gestionar la administración de usuarios, la estructura académica (} y materias), la vinculación de profesores y estudiantes con sus respectivas asignaturas, la carga de recursos/archivos por parte de los profesores y el seguimiento de las descargas realizadas por los estudiantes.
 
 El alcance de la base de datos incluye las siguientes entidades:
 

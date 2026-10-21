@@ -12,6 +12,20 @@
     --shadow: 0 24px 70px rgba(67, 48, 34, 0.18);
 }
 
+:root[data-theme="dark"] {
+    --ink: #f0eee8;
+    --muted: #c1bbb1;
+    --paper: #272a27;
+    --linen: #41413b;
+    --clay: #d47a5d;
+    --clay-dark: #a9513e;
+    --olive: #a3ae83;
+    --gold: #e1bc68;
+    --white: #f0eee8;
+    --line: rgba(240, 238, 232, 0.16);
+    --shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+}
+
 * {
     box-sizing: border-box;
 }
@@ -157,6 +171,28 @@ input {
     line-height: 1.6;
 }
 
+.form-heading-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.theme-toggle {
+    min-height: 38px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 0 12px;
+    color: var(--ink);
+    font-weight: 700;
+    background: var(--linen);
+    cursor: pointer;
+}
+
+.theme-toggle:hover {
+    border-color: var(--olive);
+}
+
 .login-form {
     display: grid;
     gap: 20px;
@@ -246,6 +282,22 @@ input {
 .login-feedback small {
     color: var(--olive);
     font-weight: 700;
+}
+
+:root[data-theme="dark"] body {
+    background:
+        linear-gradient(135deg, rgba(214, 168, 79, 0.08), transparent 34%),
+        linear-gradient(315deg, rgba(163, 174, 131, 0.08), transparent 38%),
+        var(--paper);
+}
+
+:root[data-theme="dark"] .brand-panel,
+:root[data-theme="dark"] .form-panel {
+    background: rgba(48, 47, 43, 0.92);
+}
+
+:root[data-theme="dark"] .field-group input {
+    background: #262724;
 }
 
 @media (max-width: 860px) {
