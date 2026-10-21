@@ -13,6 +13,21 @@
     --shadow: 0 24px 70px rgba(68, 46, 29, 0.2);
 }
 
+:root[data-theme="dark"] {
+    --ink: #f0eee8;
+    --muted: #c1bbb1;
+    --surface: #302f2b;
+    --surface-soft: #41413b;
+    --field: #262724;
+    --line: rgba(240, 238, 232, 0.16);
+    --clay: #d47a5d;
+    --clay-dark: #a9513e;
+    --olive: #a3ae83;
+    --honey: #e1bc68;
+    --shell: #272a27;
+    --shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+}
+
 * {
     box-sizing: border-box;
 }
@@ -22,7 +37,7 @@ body {
     min-height: 100vh;
     color: var(--ink);
     font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: #c8b291;
+    background: var(--shell);
 }
 
 button,
@@ -83,7 +98,8 @@ button {
 }
 
 .nav-item,
-.logout-button {
+.logout-button,
+.theme-toggle {
     min-height: 40px;
     border: 1px solid rgba(255, 250, 242, 0.42);
     border-radius: 12px;
@@ -104,6 +120,15 @@ button {
 .logout-button {
     border-color: rgba(135, 63, 49, 0.3);
     background: rgba(135, 63, 49, 0.88);
+}
+
+.theme-toggle {
+    color: var(--surface);
+}
+
+.theme-toggle:hover {
+    color: var(--ink);
+    background: var(--surface);
 }
 
 .logout-button:hover {
@@ -427,6 +452,32 @@ button {
     font-size: 1.08rem;
 }
 
+:root[data-theme="dark"] body {
+    background: #272a27;
+}
+
+:root[data-theme="dark"] .teacher-window {
+    border-color: var(--line);
+    background: rgba(48, 47, 43, 0.94);
+}
+
+:root[data-theme="dark"] .subject-panel,
+:root[data-theme="dark"] .grades-panel {
+    background: rgba(65, 65, 59, 0.72);
+}
+
+:root[data-theme="dark"] .brand-link,
+:root[data-theme="dark"] .brand-symbol,
+:root[data-theme="dark"] .nav-item,
+:root[data-theme="dark"] .logout-button,
+:root[data-theme="dark"] .theme-toggle,
+:root[data-theme="dark"] .solid-button,
+:root[data-theme="dark"] .upload-button,
+:root[data-theme="dark"] .icon-button--delete,
+:root[data-theme="dark"] .close-modal {
+    color: var(--ink);
+}
+
 @media (max-width: 880px) {
     .teacher-topbar,
     .panel-header,
@@ -461,7 +512,8 @@ button {
     }
 
     .nav-item,
-    .logout-button {
+    .logout-button,
+    .theme-toggle {
         width: 100%;
     }
 

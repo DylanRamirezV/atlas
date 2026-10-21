@@ -42,6 +42,9 @@
             >
                 Sobre nuestro proyecto
             </button>
+            <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false">
+                Modo oscuro
+            </button>
             <form action="/logout" method="post">
                 <button class="logout-button" type="submit">Cerrar sesion</button>
             </form>
@@ -54,4 +57,21 @@
         </div>
     </section>
 </main>
+<script>
+    const themeToggle = document.getElementById("theme-toggle");
+    const savedTheme = localStorage.getItem("atlas-theme") || "light";
+
+    function applyTheme(theme) {
+        document.documentElement.dataset.theme = theme;
+        themeToggle.setAttribute("aria-pressed", String(theme === "dark"));
+        themeToggle.textContent = theme === "dark" ? "Modo claro" : "Modo oscuro";
+    }
+
+    applyTheme(savedTheme);
+    themeToggle.addEventListener("click", () => {
+        const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+        localStorage.setItem("atlas-theme", nextTheme);
+        applyTheme(nextTheme);
+    });
+</script>
 {% endblock %}
